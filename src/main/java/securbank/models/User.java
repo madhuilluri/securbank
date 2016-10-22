@@ -19,6 +19,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.LocalDateTime;
 
@@ -116,6 +117,10 @@ public class User {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<ModificationRequest> modificationRequest = new HashSet<ModificationRequest>(0);
 
+	@Column(name = "publicKey", nullable = true)
+	@Type(type="text")
+	private String publicKey;
+	
 	public User() {
 		
 	}
@@ -148,7 +153,7 @@ public class User {
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
 			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
 			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts,
-			Set<ModificationRequest> modificationRequest) {
+			Set<ModificationRequest> modificationRequest, String publicKey) {
 		super();
 		this.userId = userId;
 		this.role = role;
@@ -172,6 +177,7 @@ public class User {
 		this.active = active;
 		this.accounts = accounts;
 		this.modificationRequest = modificationRequest;
+		this.publicKey = publicKey;
 	}
 
 	/**
@@ -420,6 +426,14 @@ public class User {
 	}
 
 	/**
+	 * @return the PKI public key
+	 */
+	public String getPublicKey() {
+		return publicKey;
+	}
+
+	
+	/**
 	 * @param modifiedOn the modifiedOn to set
 	 */
 	public void setModifiedOn(LocalDateTime modifiedOn) {
@@ -481,6 +495,14 @@ public class User {
 	public void setModificationRequest(Set<ModificationRequest> modificationRequest) {
 		this.modificationRequest = modificationRequest;
 	}
+	
+	
+	/**
+	 * @param String PKI public key
+	 */
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -493,6 +515,6 @@ public class User {
 				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
 				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
 				+ ", active=" + active + ", accounts=" + accounts + ", modificationRequest=" + modificationRequest
-				+ "]";
+				+ ", publicKey =" + publicKey + "]";
 	}
 }

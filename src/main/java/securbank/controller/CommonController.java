@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import securbank.models.ChangePasswordRequest;
 import securbank.models.User;
+import securbank.services.PkiService;
 import securbank.services.UserService;
 import securbank.validators.ChangePasswordFormValidator;
 import securbank.validators.NewUserFormValidator;
@@ -40,6 +41,7 @@ public class CommonController {
 
 	@Autowired 
 	ChangePasswordFormValidator changePasswordFormValidator;
+	
 
 	final static Logger logger = LoggerFactory.getLogger(CommonController.class);
 		

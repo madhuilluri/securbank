@@ -10,5 +10,5 @@ import org.springframework.mail.SimpleMailMessage;
  *
  */
 public interface EmailService {
-	public boolean sendEmail(SimpleMailMessage message); 
+	public boolean sendEmail(SimpleMailMessage message);
 }

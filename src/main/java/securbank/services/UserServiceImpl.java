@@ -1,5 +1,7 @@
 package securbank.services;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,6 +58,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private Environment env;
 	
+	@Autowired
+	private PkiService pkiService;
+	
 	final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 	
 	/**
@@ -80,6 +85,18 @@ public class UserServiceImpl implements UserService {
 		message.setSubject(env.getProperty("external.user.verification.subject"));
 		message.setTo(user.getEmail());
 		emailService.sendEmail(message);
+		
+		try{
+			System.out.println("Inside first login Controller ..........pki service is " + pkiService);
+			//generate private and public keys here
+			KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("DSA");
+			String publickey = pkiService.generatekeypair(user.getEmail());
+			user.setPublicKey(publickey);
+			
+		}catch(Exception ex){
+			//change the exception handling mechanism
+			ex.printStackTrace();
+		}
 		
 		return user;
 	}
