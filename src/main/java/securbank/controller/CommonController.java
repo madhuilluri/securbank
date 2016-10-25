@@ -164,7 +164,7 @@ public class CommonController {
 	public String forgotpasswordsubmit(@ModelAttribute ForgotPasswordRequest forgotPasswordRequest){
 
 		
-		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getUsername());
+		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getuserName());
 		if(user == null) {
 			logger.info("POST request: Forgot password with invalid user id");
 			
