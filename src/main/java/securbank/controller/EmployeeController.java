@@ -1,6 +1,5 @@
 package securbank.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +22,9 @@ import securbank.services.AccountService;
 import securbank.services.TransactionService;
 import securbank.services.TransferService;
 import securbank.services.UserService;
+import securbank.services.ViewAuthorizationService;
 import securbank.validators.ApprovalUserFormValidator;
+import securbank.validators.EditUserFormValidator;
 import securbank.validators.InternalEditUserFormValidator;
 
 /**
@@ -48,7 +49,13 @@ public class EmployeeController {
 	private InternalEditUserFormValidator editUserFormValidator;
 
 	@Autowired
+	private EditUserFormValidator editExternalUserFormValidator;
+	
+	@Autowired
 	private ApprovalUserFormValidator approvalUserFormValidator;
+	
+	@Autowired
+	private ViewAuthorizationService viewAuthorizationService;
 
 	final static Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 	
@@ -93,13 +100,15 @@ public class EmployeeController {
 	
 	@GetMapping("/employee/user/request")
     public String getAllUserRequest(Model model) {
-		List<ModificationRequest> modificationRequests = userService.getModificationRequests("pending", "external");
-		if (modificationRequests == null) {
-			model.addAttribute("modificationrequests", new ArrayList<ModificationRequest>());
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error:/login";
 		}
-		else {
-			model.addAttribute("modificationrequests", modificationRequests);	
-		}
+		
+		List<User> users = viewAuthorizationService.getAllAuthorization(user);
+		List<ModificationRequest> modificationRequests = userService.getModificationRequestsByUsers("pending", "external", users);
+		
+		model.addAttribute("modificationrequests", modificationRequests);	
 		logger.info("GET request: Employee All external modification requests");
 		
         return "employee/modificationrequests";
@@ -112,7 +121,13 @@ public class EmployeeController {
 		if (modificationRequest == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
-		
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+		if (!viewAuthorizationService.hasAccess(user, modificationRequest.getUser())) {
+			return "redirect:/error?code=401";
+		}
 		model.addAttribute("modificationrequest", modificationRequest);
 		logger.info("GET request: Employee external modification request by ID");
 		
@@ -135,7 +150,17 @@ public class EmployeeController {
 		if (bindingResult.hasErrors()) {
 			return "redirect:/error?code=400&path=request-action-validation";
 		}
-		
+		ModificationRequest modificationRequest = userService.getModificationRequest(requestId);
+		if (modificationRequest == null) {
+			return "redirect:/error?code=400&path=request-action-validation";
+		}
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+		if (!viewAuthorizationService.hasAccess(user, modificationRequest.getUser())) {
+			return "redirect:/error?code=401";
+		}
 		// checks if employee is authorized for the request to approve
 		if (!userService.verifyModificationRequestUserType(requestId, "external")) {
 			logger.warn("GET request: Admin unauthrorised request access");
@@ -166,6 +191,13 @@ public class EmployeeController {
 		if (modificationRequest == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+		if (!viewAuthorizationService.hasAccess(user, modificationRequest.getUser())) {
+			return "redirect:/error?code=401";
+		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
 		logger.info("GET request: Employee external modification request by ID");
@@ -181,6 +213,13 @@ public class EmployeeController {
 		if (request == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+		if (!viewAuthorizationService.hasAccess(user, request.getUser())) {
+			return "redirect:/error?code=401";
+		}
 		
 		// checks if admin is authorized for the request to approve
 		if (!request.getUserType().equals("external")) {
@@ -193,6 +232,183 @@ public class EmployeeController {
 		
         return "redirect:/employee/user/request";
     }	
+	
+	@GetMapping("/employee/user")
+    public String getUsers(Model model) {
+		List<User> users = userService.getUsersByType("external");
+		if (users == null) {
+			return "redirect:/error?code=500";
+		}
+		model.addAttribute("users", users);
+		logger.info("GET request:  All external users");
+		
+        return "employee/externalusers";
+    }
+	
+	@GetMapping("/employee/user/{id}")
+    public String getUserDetails(Model model, @PathVariable UUID id) {
+		User user = userService.getUserByIdAndActive(id);
+		User current = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error?code=404";
+		}
+		if (current == null) {
+			return "redirect:/login";
+		}
+		if (!user.getType().equals("external")) {
+			logger.warn("GET request: Unauthorised request for external user detail");
+			
+			return "redirect:/error?code=401";
+		}
+		if (!viewAuthorizationService.hasAccess(current, user)) {
+			return "redirect:/error?code=401";
+		}
+		model.addAttribute("user", user);
+		logger.info("GET request:  External user detail by id");
+		
+        return "employee/userdetail";
+    }
+	
+	@GetMapping("/employee/user/edit/{id}")
+	public String editUser(Model model, @PathVariable UUID id) {
+		User user = userService.getUserByIdAndActive(id);
+		User current = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error?code=404";
+		}
+		if (current == null) {
+			return "redirect:/login";
+		}
+		if (!user.getType().equals("external")) {
+			logger.warn("GET request: Unauthorised request for external user edit");
+			
+			return "redirect:/error?code=401";
+		}
+		if (!viewAuthorizationService.hasAccess(current, user)) {
+			return "redirect:/error?code=401";
+		}
+		
+		model.addAttribute("user", user);
+		logger.info("GET request: All external users");
+
+		return "employee/externalusers_edit";
+	}
+	
+	@PostMapping("/employee/user/edit/{id}")
+    public String editSubmit(@ModelAttribute User user, @PathVariable UUID id, BindingResult bindingResult) {
+		User current = userService.getUserByIdAndActive(id);
+		User employee = userService.getCurrentUser();
+		if (employee == null) {
+			return "redirect:/login";
+		}
+		if (current == null) {
+			return "redirect:/error?code=404";
+		}
+		
+		editExternalUserFormValidator.validate(user, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "redirect:/error?code=400?path=form-validation";
+        }
+		if (!current.getType().equals("external")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		if (!viewAuthorizationService.hasAccess(employee, current)) {
+			return "redirect:/error?code=401";
+		}
+		
+		user.setUserId(id);
+		logger.info("POST request: Internal user edit");
+		user = userService.editUser(user);
+		if (user == null) {
+			return "redirect:/error?code=500";
+		}
+		
+        return "redirect:/employee/user";
+    }
+	
+	@GetMapping("/employee/user/delete/{id}")
+	public String deleteUser(Model model, @PathVariable UUID id) {
+		User user = userService.getUserByIdAndActive(id);
+		User current = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error?code=404";
+		}
+		if (current == null) {
+			return "redirect:/login";
+		}
+		if (!user.getType().equals("external")) {
+			logger.warn("GET request: Unauthorised request for external user edit");
+			
+			return "redirect:/error?code=401";
+		}
+		if (!viewAuthorizationService.hasAccess(current, user)) {
+			return "redirect:/error?code=401";
+		}
+		
+		model.addAttribute("user", user);
+		logger.info("GET request: Delete external user");
+		
+		return "employee/externalusers_delete";
+	}
+	
+	@PostMapping("/employee/user/delete/{id}")
+    public String deleteSubmit(@ModelAttribute User user, @PathVariable UUID id, BindingResult bindingResult) {
+		User current = userService.getUserByIdAndActive(id);
+		if (current == null) {
+			return "redirect:/error?code=404";
+		}
+		if (!current.getType().equals("external")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		User employee = userService.getCurrentUser();
+		if (employee == null) {
+			return "redirect:/login";
+		}
+		if (!viewAuthorizationService.hasAccess(employee, current)) {
+			return "redirect:/error?code=401";
+		}
+		userService.deleteUser(id);
+		logger.info("POST request: Employee New modification request");
+    	
+        return "redirect:/employee/user";
+    }
+	
+	// View Authorization Start
+	@GetMapping("/employee/user/requestaccess")
+    public String addViewRequest(Model model) {
+		model.addAttribute("user", new User());
+		logger.info("GET request: Request for user");
+		
+        return "employee/requestaccess";
+    }
+	
+	@PostMapping("/employee/user/requestaccess")
+    public String addViewRequest(@ModelAttribute User user, BindingResult bindingResult) {
+		if (user.getEmail() == null || user.getEmail().equals("")) {
+			bindingResult.rejectValue("email", "email.invalid", "Email not valid");
+		}
+		user = userService.getUserByUsernameOrEmail(user.getEmail());
+		if (user == null || !user.getType().equalsIgnoreCase("external")) {
+			bindingResult.rejectValue("email", "email.invalid", "Email not valid");
+		}
+		
+		if (viewAuthorizationService.hasAccess(userService.getCurrentUser(), user)) {
+			bindingResult.rejectValue("email", "email.invalid", "Authorization exists");
+		}
+		
+		if (bindingResult.hasErrors()) {
+			return "employee/requestaccess";
+		}
+		viewAuthorizationService.createAuthorization(userService.getCurrentUser(), user, false);
+		logger.info("POST request: Employee request access");
+		
+        return "redirect:/employee/user/requestaccess";
+    }	
+	
 	
 	@GetMapping("/employee/transactions")
     public String getTransactions(Model model) {

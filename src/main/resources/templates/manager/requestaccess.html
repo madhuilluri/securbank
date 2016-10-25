@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>System Manager Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+</head>
+<body>
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+					<li><a th:href="@{/manager/details}">My Dashboard</a></li>
+					<li><a th:href="@{/logout}">Logout</a></li>
+				</ul>
+		</div>
+	</nav>
+
+	<div class="container">
+		<h3>System Manager Dashboard</h3>
+		<ul class="nav nav-tabs nav-justified">
+			<li><a th:href="@{/manager/user}">View External User Accounts</a></li>
+			<li><a th:href="@{/manager/details}">My Profile</a></li>
+			<li><a th:href="@{/manager/user/request}">New External User Requests</a></li>
+			<li class="active"><a href="#">Authorize Access</a></li>
+			<li><a th:href="@{/manager/employee/request}">View Access Requests</a></li>
+			<li><a th:href="@{/manager/transfers}">Pending Transfers</a></li>
+			<li><a th:href="@{/manager/transactions}">Pending Transactions</a></li>
+		</ul>
+	</div>
+
+	<div class="container">
+		<form class="form-horizontal" action="#" th:action="@{/manager/employee/authorize}" th:object="${viewrequest}"
+			method="post">
+			<fieldset>
+
+				<div class="alert alert-success" th:if="${success}">Authorization
+					Sent</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="textinput">Employee Email</label>
+						<div class="col-md-4">
+							<input id="textinput" name="textinput" type="text" placeholder=""
+								class="form-control input-md" required="" th:field="*{employee.email}" />
+							<div class="alert alert-danger"
+								th:if="${#fields.hasErrors('employee.email')}" th:errors="*{employee.email}"></div>
+						</div>
+					</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">External Email</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" required="" th:field="*{external.email}" />
+						<div class="alert alert-danger"
+							th:if="${#fields.hasErrors('external.email')}" th:errors="*{external.email}"></div>
+					</div>
+				</div>
+				<!-- Button (Double) -->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="button1id"></label>
+					<div class="col-md-8">
+						<input id="submit-btn" name="submit-btn" type="submit"
+							class="btn btn-primary" value="Submit" /> <input id="reset-btn"
+							name="reset-btn" type="reset" class="btn btn-inverse"
+							value="Reset" />
+					</div>
+				</div>
+
+			</fieldset>
+		</form>
+	</div>
+</body>
+</html>

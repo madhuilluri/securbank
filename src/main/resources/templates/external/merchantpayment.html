@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+        <title>New Payment Request</title>
+    </head>
+    <body>
+        <form action="#" th:action="@{/user/merchant/payment}" th:object="${transfer}" method="post">
+   		 <p> Please generate your OTP before you proceed with the transfer </p>
+   		 <p>
+        	From: <input type="text" th:field="*{fromAccount.user.email}" /> </p>
+        	<p th:if="${#fields.hasErrors('fromAccount.user.email')}" th:errors="*{fromAccount.user.email}"></p> 
+        <p>
+        	Amount: <input type="text" th:field="*{amount}" /> </p>
+        	<p th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">Amount Error</p>
+        	
+        	<p><a th:href="@{/user/merchanttransfer/otp}">Generate OTP</a></p>
+        <p>
+        	OTP: <input type="text" th:field="*{otp}" /> </p>
+        	
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset"/></p>
+    </form>
+    </body>
+</html>

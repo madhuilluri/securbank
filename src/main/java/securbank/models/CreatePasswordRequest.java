@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
  *
  */
 
-@Entity
 @Component("createPasswordRequest")
 public class CreatePasswordRequest {
 	

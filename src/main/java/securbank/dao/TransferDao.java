@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import securbank.models.Account;
 import securbank.models.Transfer;
+import securbank.models.User;
 
 /**
  * @author Mitikaa Sama
@@ -17,4 +18,5 @@ public interface TransferDao extends BaseDao<Transfer, UUID>{
 	public List<Transfer> findTransferByToAccount(Account toAccount);
 	public List<Transfer> findByApprovalStatus(String approvalStatus);
 	public List<Transfer> findPendingTransferByFromAccount(Account fromAccount);
+	public List<Transfer> findByUserAndApprovalStatus(User user, String status);
 }

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
  * @author Shivani Jhunjhunwala
  *
  */
-@Entity
 @Component("changePasswordRequest")
 public class ChangePasswordRequest {
 	

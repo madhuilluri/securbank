@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+  <title>Reset Password</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}"/>
+  <script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+  <script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+</head>
+<body>
+
+  <div class="alert alert-danger" th:if="${param.error}"></div>
+
+  <div class="container">
+    <form class="form-horizontal" action="#" th:action="@{/reactivate}" th:object="${createPasswordRequest}" method="post">
+      <fieldset>
+
+        <!-- Form Name -->
+        <legend>Reset Password</legend>
+        
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Phone Number</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{phone}"/>
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+          </div>
+        </div>
+        
+         <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">E-mail</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" th:field="*{email}"/>
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+          </div>
+        </div>
+		
+ 		<!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Password</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{newPassword}"/>
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Confirm Password</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{confirmPassword}"/>
+          </div>
+        </div>
+
+        <!-- Button -->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="submitbutton"></label>
+          <div class="col-md-8">
+            <button id="submitbutton" name="submitbutton" type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+         </fieldset>
+    </form>
+  </div>
+</body>
+</html>

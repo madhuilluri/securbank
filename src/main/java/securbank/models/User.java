@@ -23,6 +23,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.LocalDateTime;
 
+import securbank.models.LoginAttempt;
+
 /**
  * @author Ayush Gupta
  *
@@ -113,6 +115,10 @@ public class User {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<Account> accounts = new HashSet<Account>(0);
 
+	/**One to one relationship */
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private LoginAttempt loginAttempt;
+	
 	/** One to many relation ship  */
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<ModificationRequest> modificationRequest = new HashSet<ModificationRequest>(0);
@@ -123,7 +129,7 @@ public class User {
 	public User() {
 		
 	}
-
+	
 	/**
 	 * @param userId
 	 * @param role
@@ -146,13 +152,15 @@ public class User {
 	 * @param lastLogin
 	 * @param active
 	 * @param accounts
+	 * @param loginAttempt
 	 * @param modificationRequest
+	 * @param pii
 	 */
 	public User(UUID userId, String role, String type, String username, String password, String confirmPassword,
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
 			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
 			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts,
-			Set<ModificationRequest> modificationRequest, Pii pii) {
+			LoginAttempt loginAttempt, Set<ModificationRequest> modificationRequest, Pii pii) {
 		super();
 		this.userId = userId;
 		this.role = role;
@@ -175,9 +183,11 @@ public class User {
 		this.lastLogin = lastLogin;
 		this.active = active;
 		this.accounts = accounts;
+		this.loginAttempt = loginAttempt;
 		this.modificationRequest = modificationRequest;
 		this.pii = pii;
 	}
+
 
 	/**
 	 * @return the userId
@@ -472,6 +482,14 @@ public class User {
 	public void setAccounts(Set<Account> accounts) {
 		this.accounts = accounts;
 	}
+	
+	public void setLoginAttempt(LoginAttempt attempt){
+		this.loginAttempt=attempt;
+	}
+	
+	public LoginAttempt getLoginAttempt(){
+		return loginAttempt;
+	}
 
 	/**
 	 * @return the modificationRequest
@@ -511,8 +529,8 @@ public class User {
 				+ middleName + ", lastName=" + lastName + ", email=" + email + ", phone=" + phone + ", addressLine1="
 				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
 				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
-				+ ", active=" + active + ", accounts=" + accounts + ", modificationRequest=" + modificationRequest
-				+ ", pii=" + pii + "]";
+				+ ", active=" + active + ", accounts=" + accounts + ", loginAttempt=" + loginAttempt
+				+ ", modificationRequest=" + modificationRequest + ", pii=" + pii + "]";
 	}
 
 }

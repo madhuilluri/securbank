@@ -6,7 +6,6 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Component;
 
-@Entity
 @Component("forgotPasswordRequest")
 public class ForgotPasswordRequest {
 	

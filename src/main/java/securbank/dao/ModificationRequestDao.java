@@ -14,4 +14,5 @@ public interface ModificationRequestDao extends BaseDao<ModificationRequest, UUI
 	public List<ModificationRequest> findAll();
 	public List<ModificationRequest> findAllbyStatusAndUserType(String status, String userType);
 	public List<ModificationRequest> findAllbyUser(User user);
+	public List<ModificationRequest> findAllbyStatusAndUserTypeAndUsers(String status, String userType, List<User> users);
 }

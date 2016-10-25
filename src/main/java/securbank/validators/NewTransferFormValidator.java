@@ -3,12 +3,17 @@
  */
 package securbank.validators;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import securbank.models.Otp;
 import securbank.models.Transfer;
+import securbank.models.User;
+import securbank.services.OtpService;
+import securbank.services.UserService;
 import securbank.utils.ContraintUtils;
 
 /**
@@ -19,6 +24,12 @@ import securbank.utils.ContraintUtils;
 @Component("newTransferFormValidator")
 public class NewTransferFormValidator implements Validator{
 
+	@Autowired
+	UserService userService;
+	
+	@Autowired
+	OtpService otpService;
+	
 	/**
      * If supports class
      * 
@@ -53,6 +64,12 @@ public class NewTransferFormValidator implements Validator{
 		
 		if (!errors.hasFieldErrors("amount") && !ContraintUtils.validateTransactionAmount(Double.toString(transfer.getAmount()))) {
 			errors.rejectValue("amount", "transaction.amount.invalid", "Invalid Amount");
+		}
+		
+		User user = userService.getCurrentUser();
+		Otp otp = otpService.getOtpByUser(user);
+		if (otp==null || !transfer.getOtp().equals(otp.getCode())){
+			errors.rejectValue("otp", "transfer.otp.invalid", "Invalid Otp");
 		}
 		
 	}
