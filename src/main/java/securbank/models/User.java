@@ -17,6 +17,7 @@ import javax.validation.constraints.Size;
 import javax.persistence.CascadeType; 
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Email;
@@ -115,7 +116,10 @@ public class User {
 	/** One to many relation ship  */
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<ModificationRequest> modificationRequest = new HashSet<ModificationRequest>(0);
-
+	
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private Pii pii;
+	
 	public User() {
 		
 	}
@@ -148,7 +152,7 @@ public class User {
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
 			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
 			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts,
-			Set<ModificationRequest> modificationRequest) {
+			Set<ModificationRequest> modificationRequest, Pii pii) {
 		super();
 		this.userId = userId;
 		this.role = role;
@@ -172,6 +176,7 @@ public class User {
 		this.active = active;
 		this.accounts = accounts;
 		this.modificationRequest = modificationRequest;
+		this.pii = pii;
 	}
 
 	/**
@@ -482,6 +487,20 @@ public class User {
 		this.modificationRequest = modificationRequest;
 	}
 
+	/**
+	 * @return the pii
+	 */
+	public Pii getPii() {
+		return pii;
+	}
+
+	/**
+	 * @param pii the pii to set
+	 */
+	public void setPii(Pii pii) {
+		this.pii = pii;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -493,6 +512,7 @@ public class User {
 				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
 				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
 				+ ", active=" + active + ", accounts=" + accounts + ", modificationRequest=" + modificationRequest
-				+ "]";
+				+ ", pii=" + pii + "]";
 	}
+
 }

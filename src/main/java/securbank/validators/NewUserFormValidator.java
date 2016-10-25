@@ -6,6 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.ValidationUtils;
 
+import securbank.models.Pii;
 import securbank.models.User;
 import securbank.utils.ContraintUtils;
 import securbank.dao.UserDao;

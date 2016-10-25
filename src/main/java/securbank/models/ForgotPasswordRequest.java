@@ -12,7 +12,7 @@ public class ForgotPasswordRequest {
 	
 	@Id
 	@NotNull
-	String userName;
+	String username;
 	
 	@NotNull
 	String email;
@@ -26,24 +26,24 @@ public class ForgotPasswordRequest {
 	 * @param userName
 	 * @param email
 	 */
-	public ForgotPasswordRequest(String userName, String email){
+	public ForgotPasswordRequest(String username, String email){
 		super();
-		this.userName = userName;
+		this.username = username;
 		this.email = email;
 	}
 
 	/**
 	 * @return the userName
 	 */
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
 	/**
 	 * @param userName the userName to set
 	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	/**

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
+import securbank.services.AccessPiiService;
 import securbank.services.UserService;
 import securbank.validators.ApprovalInternalUserFormValidator;
 import securbank.validators.EditUserFormValidator;
@@ -36,6 +37,9 @@ import securbank.validators.NewUserRequestFormValidator;
 public class AdminController {
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private AccessPiiService accessPii;
 	
 	@Autowired
 	private NewUserRequestFormValidator newUserRequestFormValidator;
@@ -349,6 +353,12 @@ public class AdminController {
 	@RequestMapping("/admin/syslogs")
 	public String adminControllerSystemLogs(Model model) {
 		return "admin/systemlogs";
+	}
+	
+	@GetMapping("/admin/user/pii")
+	public String adminAccessPII(Model model){
+		
+		return "redirect:/admin";
 	}
 
 }

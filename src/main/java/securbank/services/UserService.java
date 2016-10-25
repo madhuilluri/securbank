@@ -8,6 +8,7 @@ import securbank.models.ChangePasswordRequest;
 import securbank.models.ModificationRequest;
 
 import securbank.models.NewUserRequest;
+import securbank.models.Pii;
 import securbank.models.User;
 
 /**

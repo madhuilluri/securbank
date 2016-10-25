@@ -12,6 +12,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
 import securbank.models.User;
+import securbank.models.Pii;
 
 /**
  * @author Ayush Gupta
@@ -139,5 +140,26 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
 		return this.entityManager.createQuery("SELECT COUNT(user) from User user where (user.phone = :phone AND user.active = true)", Long.class)
 					.setParameter("phone", phone)
 					.getSingleResult() != 0;
+	}
+	
+	/**
+	 * Returns if ssn exists in table
+	 * 
+	 * @param ssn
+	 * 			The ssn to check
+	 * @return boolean
+	 */
+	@Override
+	public boolean ssnExists(String ssn) {
+		return this.entityManager.createQuery("SELECT COUNT(pii) from Pii pii where (pii.ssn = :ssn)", Long.class)
+				.setParameter("ssn",ssn)
+				.getSingleResult()!=0;
+
+	}
+
+	@Override
+	public List<Pii> accessPii() {
+		return this.entityManager.createQuery("SELECT pii from Pii pii", Pii.class)
+											.getResultList();
 	}
 }

@@ -124,6 +124,17 @@
 							th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
 					</div>
 				</div>
+				
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">Social Security Number</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" required="" th:field="*{pii.ssn}" />
+						<div class="alert alert-danger"
+							th:if="${#fields.hasErrors('pii.ssn')}" th:errors="*{pii.ssn}"></div>
+					</div>
+				</div>
 
 				<!-- Text input-->
 				<div class="form-group">

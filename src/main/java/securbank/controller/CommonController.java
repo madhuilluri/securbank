@@ -23,8 +23,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+
 import securbank.models.CreatePasswordRequest;
 import securbank.models.ForgotPasswordRequest;
+import securbank.models.Pii;
 import securbank.models.ChangePasswordRequest;
 import securbank.models.User;
 import securbank.dao.UserDao;
@@ -37,6 +40,7 @@ import securbank.validators.CreatePasswordFormValidator;
 import securbank.validators.ChangePasswordFormValidator;
 
 import securbank.validators.NewUserFormValidator;
+import securbank.validators.SsnFormValidator;
 
 /**
  * @author Ayush Gupta
@@ -56,6 +60,9 @@ public class CommonController {
 
 	@Autowired
 	NewUserFormValidator userFormValidator;
+	
+	@Autowired
+	SsnFormValidator ssnFormValidator;
 	
 	@Autowired
 	UserDao userDAO;
@@ -109,6 +116,7 @@ public class CommonController {
 
 	@PostMapping("/signup")
 	public String signupSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		
 		userFormValidator.validate(user, bindingResult);
 		if (bindingResult.hasErrors()) {
 			logger.info("POST request: signup form with validation errors");
@@ -146,7 +154,7 @@ public class CommonController {
 	@PostMapping("/forgotpassword")
 	public String forgotpasswordsubmit(@ModelAttribute ForgotPasswordRequest forgotPasswordRequest){
 		
-		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getUserName());
+		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getUsername());
 		if(user==null){
 			logger.info("POST request: Forgot password with invalid user id");
 			return "redirect:/error?code=400&path=bad-request";
@@ -171,7 +179,7 @@ public class CommonController {
 			return "redirect:/error?code=user.notfound";
 		}
 		
-		model.addAttribute("createpasswordrequest", new CreatePasswordRequest());
+		model.addAttribute("request", new CreatePasswordRequest());
 		logger.info("GET request : Create new password");
 		return "createpassword";
 	}

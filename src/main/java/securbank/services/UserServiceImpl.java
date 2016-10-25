@@ -23,6 +23,7 @@ import securbank.models.Account;
 import securbank.models.ChangePasswordRequest;
 import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
+import securbank.models.Pii;
 import securbank.models.User;
 
 /**
@@ -67,12 +68,17 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User createExternalUser(User user) {
+		Pii pii = user.getPii();
 		logger.info("Creating new external user");
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(false);
 		user.setType("external");
 		user = userDao.save(user);
+		
+		//setup personal information
+		pii.setUser(user);
+		pii.setSsn(pii.getSsn());
 		
 		//setup up email message
 		message = new SimpleMailMessage();
