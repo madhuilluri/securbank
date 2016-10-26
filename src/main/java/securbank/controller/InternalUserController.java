@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import securbank.exceptions.Exceptions;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
@@ -38,12 +39,13 @@ public class InternalUserController {
 	final static Logger logger = LoggerFactory.getLogger(InternalUserController.class);
 	
 	@GetMapping("/internal/user/verify/{id}")
-    public String verifyNewUser(Model model, @PathVariable UUID id) {
+    public String verifyNewUser(Model model, @PathVariable UUID id) throws Exceptions {
 		NewUserRequest newUserRequest = userService.getNewUserRequest(id);
 		if (newUserRequest == null) {
 			logger.info("GET request: Invalid verfication for new user");
 			
-			return "redirect/error?code=400&path=no-request";
+			//return "redirect/error?code=400&path=no-request";
+			throw new Exceptions("400","No Request !");
 		}
 		
 		logger.info("GET request: Verify new internal user");
@@ -57,12 +59,13 @@ public class InternalUserController {
     }
 	
 	@PostMapping("/internal/user/signup")
-    public String internalSignupSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+    public String internalSignupSubmit(@ModelAttribute User user, BindingResult bindingResult) throws Exceptions {
 		UUID token = (UUID) session.getAttribute("verification.token");
 		if (token == null) {
 			logger.info("POST request: Signup internal user with invalid session token");
 			
-			return "redirect:/error?code=400&path=bad-request";
+			//return "redirect:/error?code=400&path=bad-request";
+			throw new Exceptions("400","Bad Request !");
 		}
 		else {
 			// clears session
@@ -73,12 +76,14 @@ public class InternalUserController {
 		if (newUserRequest == null) {
 			logger.info("POST request: Signup internal user with invalid id");
 			
-			return "redirect:/error?code=400&path=token-invalid";
+			//return "redirect:/error?code=400&path=token-invalid";
+			throw new Exceptions("400","Invalid Token !");
 		}
 		if(!newUserRequest.getEmail().equals(user.getEmail()) || !newUserRequest.getRole().equals(user.getRole())) {
 			logger.info("GET request: Signup internal user with invalid credentials");
 			
-			return "redirect:/error?code=400";
+			//return "redirect:/error?code=400";
+			throw new Exceptions("400"," ");
 		}
 		userFormValidator.validate(user, bindingResult);
 		
@@ -87,7 +92,8 @@ public class InternalUserController {
         }
 		
 		if (userService.createInternalUser(user) == null) {
-			return "redirect:/error?code=400&path=user-invalid";
+			//return "redirect:/error?code=400&path=user-invalid";
+			throw new Exceptions("400","User Invalid !");
 		};
     	
         return "redirect:/login";
