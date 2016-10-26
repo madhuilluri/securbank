@@ -52,6 +52,9 @@
 			<li class="active"><a href="#">View Access Requests</a></li>
 		</ul>
 	</div>
+
+<div class="alert alert-success" th:if="${param.successAction}">Successfuly approved/rejected access request</div>
+
 	<div class="container">
 		<div class="input-group">
 			<span class="input-group-addon">Filter</span> <input id="filter"

@@ -54,20 +54,10 @@
 			<li><a th:href="@{/admin/syslogs}">System Logs</a></li>
 		</ul>
 	</div>
-	<!-- <table>
-		<tr>
-			<td>Username</td>
-			<td>View</td>
-			<td>Delete</td>
-		</tr>
-		<tr th:each="request : ${modificationrequests}">
-			<td th:text="${request.user.username}"></td>
-			<td><a
-				th:href="@{/admin/user/request/view/{id}(id=${request.modificationRequestId})}">View</a></td>
-			<td><a
-				th:href="@{/admin/user/request/delete/{id}(id=${request.modificationRequestId})}">Delete</a></td>
-		</tr>
-	</table> -->
+
+	<div class="alert alert-success" th:if="${param.successAction}">Successfuly approved/rejected internal user request</div>
+	<div class="alert alert-success" th:if="${param.successDelete}">Successfuly deleted internal user request</div>
+
 	<div class="container">
 		<div class="input-group">
 			<span class="input-group-addon">Filter</span> <input id="filter"
