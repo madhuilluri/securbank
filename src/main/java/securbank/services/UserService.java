@@ -28,11 +28,14 @@ public interface UserService {
 	public ModificationRequest approveModificationRequest(ModificationRequest request);
 	public ModificationRequest rejectModificationRequest(ModificationRequest requestId);
 	public List<ModificationRequest> getModificationRequests(String status, String type);
+	public List<ModificationRequest> getModificationRequestsByUsers(String status, String type, List<User> user);
 	public ModificationRequest getModificationRequest(UUID requestId);
 	public boolean verifyModificationRequest(String status, UUID requestId);
 	public boolean verifyModificationRequestUserType(UUID requestId, String type);
 	public void deleteModificationRequest(ModificationRequest request);
+	public User getUserByUsernameOrEmail(String email);
 	public boolean verifyCurrentPassword(User user,String password);
 	public User changeUserPassword(User user, ChangePasswordRequest model);
+	public User getUserByEmail(String email);
 }
 

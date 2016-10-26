@@ -3,10 +3,58 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-<title>Modification Requests</title>
+<title>Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+<script>
+  $(document).ready(function () {
+
+    (function ($) {
+
+      $('#filter').keyup(function () {
+
+        var rex = new RegExp($(this).val(), 'i');
+        $('.searchable tr').hide();
+        $('.searchable tr').filter(function () {
+          return rex.test($(this).text());
+        }).show();
+
+      })
+
+    }(jQuery));
+
+  });
+  </script>
 </head>
 <body>
-	<table>
+
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+		      <li><a th:href="@{/admin/details}">My Dashboard</a></li>
+		      <li><a th:href="@{/logout}">Logout</a></li>
+		    </ul>
+		</div>
+</nav>
+	<div class="container">
+		<h3>Admin Dashboard</h3>
+		<ul class="nav nav-tabs nav-justified">
+			<li><a th:href="@{/admin/user}">View Internal User Accounts</a></li>
+			<li><a th:href="@{/admin/user/add}">Create Internal User
+					Account</a></li>
+			<li><a th:href="@{/admin/details}">My Profile</a></li>
+			<li class="active"><a href="#">New Internal User Requests</a></li>
+			<li><a th:href="@{/admin/syslogs}">System Logs</a></li>
+		</ul>
+	</div>
+	<!-- <table>
 		<tr>
 			<td>Username</td>
 			<td>View</td>
@@ -19,6 +67,36 @@
 			<td><a
 				th:href="@{/admin/user/request/delete/{id}(id=${request.modificationRequestId})}">Delete</a></td>
 		</tr>
-	</table>
+	</table> -->
+	<div class="container">
+		<div class="input-group">
+			<span class="input-group-addon">Filter</span> <input id="filter"
+				type="text" class="form-control" placeholder="Type here..." />
+		</div>
+	<div class="container">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Username</th>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Role</th>
+				</tr>
+			</thead>
+			<tbody class="searchable">
+				<tr th:each="request : ${modificationrequests}">
+					<td th:text="${request.user.username}"></td>
+					<td th:text="${request.user.firstName}"></td>
+					<td th:text="${request.user.lastName}"></td>
+					<td th:text="${request.user.role}"></td>
+					<td><a class="btn btn-primary"
+						th:href="@{/admin/user/request/view/{id}(id=${request.modificationRequestId})}">View</a></td>
+					<td><a class="btn btn-danger"
+						th:href="@{/admin/user/request/delete/{id}(id=${request.modificationRequestId})}">Delete</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
 </body>
 </html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>System Manager Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+<script>
+  $(document).ready(function () {
+
+    (function ($) {
+
+      $('#filter').keyup(function () {
+
+        var rex = new RegExp($(this).val(), 'i');
+        $('.searchable tr').hide();
+        $('.searchable tr').filter(function () {
+          return rex.test($(this).text());
+        }).show();
+
+      })
+
+    }(jQuery));
+
+  });
+  </script>
+</head>
+<body>
+
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+		      <li><a th:href="@{/manager/details}">My Dashboard</a></li>
+		      <li><a th:href="@{/logout}">Logout</a></li>
+		    </ul>
+		</div>
+</nav>
+	<div class="container">
+		<h3>System Manager Dashboard</h3>
+		<ul class="nav nav-tabs nav-justified">
+			<li><a th:href="@{/manager/user}">View External User Accounts</a></li>
+			<li><a th:href="@{/manager/details}">My Profile</a></li>
+			<li><a th:href="@{/manager/user/request}">New External User Requests</a></li>
+			<li><a th:href="@{/manager/employee/authorize}">Authorize Access</a></li>
+			<li><a th:href="@{/manager/employee/request}">View Access Requests</a></li>
+      <li class="active"><a href="#">Pending Transfers</a></li>
+			<li><a th:href="@{/manager/transactions}">Pending Transactions</a></li>
+		</ul>
+	</div>
+	<div class="container">
+		<div class="input-group">
+			<span class="input-group-addon">Filter</span> <input id="filter"
+				type="text" class="form-control" placeholder="Type here..." />
+		</div>
+	<div class="container">
+		<table class="table table-striped">
+			<thead>
+        <tr>
+  				<th>From</th>
+  				<th>Account Number</th>
+  				<th>To</th>
+  				<th>Account Number</th>
+  				<th>Amount</th>
+  			</tr>
+			</thead>
+			<tbody class="searchable">
+        <tr th:each="transfer : ${transfers}">
+          <td th:text="${transfer.fromAccount.user.username}"></td>
+          <td th:text="${transfer.fromAccount.accountNumber}"></td>
+          <td th:text="${transfer.toAccount.user.username}"></td>
+          <td th:text="${transfer.toAccount.accountNumber}"></td>
+          <td th:text="${transfer.amount}"></td>
+          <td><a th:href="@{/manager/transfer/{id}(id=${transfer.transferId})}">View</a></td>
+				</tr> -->
+			</tbody>
+		</table>
+	</div>
+</div>
+</body>
+</html>

@@ -1,35 +1,79 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-<title>Spring Security Example</title>
+	<title>Delete External User Request</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+	<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
 </head>
 <body>
-	<form action="#"
-		th:action="@{/employee/user/request/delete/{id}(id=${modificationrequest.modificationRequestId})}"
-		th:object="${modificationrequest}" method="post">
-		<p>Email:
-		<p th:text="*{email}" /></p>
-		<p>First Name:
-		<p th:text="*{firstName}" /></p>
-		<p>Last Name:
-		<p th:text="*{lastName}" /></p>
-		<p>Phone:
-		<p th:text="*{phone}" /></p>
-		<p>Address Line1:
-		<p th:text="*{addressLine1}" /></p>
-		<p>City:
-		<p th:text="*{city}" /></p>
-		<p>Zip:
-		<p th:text="*{zip}" /></p>
-		<p>State:
-		<p th:text="*{state}" /></p>
-		<p>Role:
-		<p th:text="*{role}" /></p>
-		<p>
-			<input type="submit" value="Delete" /> 
-		</p>
-	</form>
+
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+					<li><a th:href="@{/employee/details}">My Dashboard</a></li>
+					<li><a th:href="@{/logout}">Logout</a></li>
+				</ul>
+		</div>
+	</nav>
+
+	<div class="container">
+		<h3 th:text="${modificationrequest.firstName+' '+modificationrequest.lastName+'s Request'}"></h3>
+	</div>
+
+	<form class="form-horizontal"
+	th:action="@{/employee/user/request/delete/{id}(id=${modificationrequest.modificationRequestId})}"
+	th:object="${modificationrequest}" method="post">
+	<div class="container">
+		<table class="table table-user-information">
+			<tbody>
+				<tr>
+					<td>Full Name</td>
+					<td th:text="*{firstName}+' '+ *{lastName}"></td>
+				</tr>
+				<tr>
+					<td>Email</td>
+					<td th:text="*{email}"></td>
+				</tr>
+				<tr>
+					<td>Address Line 1</td>
+					<td th:text="*{addressLine1}"></td>
+				</tr>
+				<tr>
+					<td>City</td>
+					<td th:text="*{city}"></td>
+				</tr>
+				<tr>
+					<td>State</td>
+					<td th:text="*{state}"></td>
+				</tr>
+				<tr>
+					<td>Zip Code</td>
+					<td th:text="*{zip}"></td>
+				</tr>
+				<tr>
+					<td>Role</td>
+					<td th:text="*{role}"></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="form-group">
+			<div class="col-md-8">
+				<button id="deletebutton" name="deletebutton" type="submit"
+				class="btn btn-danger">Delete</button>
+			</div>
+		</div>
+
+	</div>
+</form>
 </body>
 </html>

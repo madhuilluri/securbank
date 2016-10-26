@@ -4,12 +4,17 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import securbank.dao.UserDao;
+import securbank.models.LoginAttempt;
 import securbank.models.User;
+import securbank.models.Verification;
 
 /**
  * @author Ayush Gupta
@@ -21,7 +26,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	
 	@Autowired
 	private UserDao userDao;
+
 	
+	@Autowired 
+	private PasswordEncoder encoder;
+	
+	@Autowired
+	private EmailService emailService;
+	
+	private SimpleMailMessage message;
+	
+	@Autowired
+	private Environment env;
+	
+	@Autowired
+	VerificationService verificationService;
+	
+	@Autowired
+	private ForgotPasswordService forgotPasswordService;
+
 	private Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 	
 	/**
@@ -43,8 +66,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		logger.info("Verifying username and password");
 		
 		if (!BCrypt.checkpw(password, user.getPassword())) {
+			//User found-Incorrect password, counter incremented 
+			LoginAttempt attempt= user.getLoginAttempt();
+			attempt.setCounter(attempt.getCounter() + 1);
+			if(attempt.getCounter() == 3){
+				user.setActive(false);
+				
+				
+				Verification verification = verificationService.createVerificationCodeByType(user, "lock");				
+				if (verification != null) {
+					// Send email message
+					message = new SimpleMailMessage();
+					message.setText(env.getProperty("account.reactivate.body").replace(":id:",verification.getVerificationId().toString()));
+					message.setSubject(env.getProperty("account.reactivate.subject"));
+					message.setTo(user.getEmail());
+					emailService.sendEmail(message);
+					logger.info("POST request : Sending link to reset password and reactivate account.");
+				}
+			}
+			user.setLoginAttempt(attempt);
+			userDao.update(user);
 			return null;
-		};
+		}
 		
 		return user;
 	}
@@ -60,6 +103,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	public User updateLoginTime(User user) {
 		user.setLastLogin(LocalDateTime.now());
+		//Login Successful, LoginAttempt counter reset to 0
+		LoginAttempt attempt = user.getLoginAttempt();
+		if(attempt==null)
+			attempt=new LoginAttempt(user, 0, LocalDateTime.now());
+		attempt.setCounter(0);
+		attempt.setLastUpdated(LocalDateTime.now());
+		user.setLoginAttempt(attempt);
+
+		logger.info("Resetting LoginAteempt counter to 0");
+		
 		user = userDao.update(user);
 		if (user == null) {
 			return null;
@@ -68,5 +121,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		
 		return user;
 	}
+
+
+	@Override
+	public String getRedirectUrlFromRole(String role) {
+		// TODO Auto-generated method stub
+		String targetUrl = "";
+        if(role.contains("ADMIN")) {
+            targetUrl = "/admin/details";
+        } else if(role.contains("MANAGER")) {
+            targetUrl = "/manager/details";
+        } else if(role.contains("EMPLOYEE")) {
+            targetUrl = "/employee/details";
+        } else if(role.contains("INDIVIDUAL")) {
+            targetUrl = "/user/details";
+        } else if(role.contains("MERCHANT")) {
+            targetUrl = "/merchant/details";
+        }
+        return targetUrl;
+	}
+
 	
 }

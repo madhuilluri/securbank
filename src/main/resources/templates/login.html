@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
     <head>
-        <title>Spring Security Example </title>
+        <title>Login</title>
 
         <link href="https://fonts.googleapis.com/css?family=Bitter:700" rel="stylesheet"/>
    	    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
@@ -11,13 +11,6 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     </head>
     <body>
-
-        <div th:if="${param.error}">
-            Invalid username and password.
-        </div>
-        <div th:if="${param.logout}">
-            You have been logged out.
-        </div>
         <div class="row" style="width:110%;background-color:black;height:250px;overflow:hidden">
         <div class="col-xs-4">
         <a class="navbar-brand" href="#">
@@ -58,10 +51,16 @@
         </div>
         <div class="row">
         <form th:action="@{/login}" method="post" class="form-group col-xs-12 col-sm-4 col-sm-offset-4" style="margin-top:20px; border:1px dashed black;min-height:300px; background-color:#D3D3D3;">
+          <div class="alert alert-danger" th:if="${param.error}">
+              Invalid username and password.
+          </div>
+          <div class="alert alert-info" th:if="${param.logout}">
+              You have been logged out.
+          </div>
             <div><label> User Name : <input class="form-control" type="text" name="username"/> </label></div>
             <div><label> Password: <input class="form-control" type="password" name="password"/> </label></div>
             <div><input class="btn btn-primary btn-block" type="submit" value="Sign In"/></div>
-            <a href="#"> Forgot password?</a> <br/>
+            <a href="/forgotpassword"> Forgot password?</a> <br/>
         </form>
         </div>
      <div class="row">

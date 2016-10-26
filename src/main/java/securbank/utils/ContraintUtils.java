@@ -21,9 +21,13 @@ public class ContraintUtils {
 	private static final String ZIP_PATTERN = "[0-9]{5}";
 	private static final String PHONE_PATTERN = "[0-9]{10}";
 	private static final String PASSWORD_PATTERN =  "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$!%]).{6,20})";
+
+	private static final String AMOUNT_PATTERN = "^[0-9]+(\\.[0-9]+)?$";
+	private static final String ACCOUNT_PATTERN = "[0-9]+";
+
 	private static final String INTERNAL_ROLES = "ROLE_MANAGER|ROLE_EMPLOYEE|ROLE_ADMIN";
 	private static final String EXTERNAL_ROLES = "ROLE_INDIVIDUAL|ROLE_MERCHANT";
-	
+
 	/**
      * Validates username
      * 
@@ -95,7 +99,46 @@ public class ContraintUtils {
 	}
 	
 	/**
-     * Validates internal role
+	 * Validates transacitonType
+	 * 
+	 * @param transactionType
+	 * 		The transaction type to be validated
+	 * @return boolean
+	 */
+	public static boolean validateTransactionType(String transactionType){
+		if(transactionType.equals("DEBIT") || transactionType.equals("CREDIT")) return true;
+		return false;
+	}
+	
+	/**
+	 * Validates transacitonAmount
+	 * 
+	 * @param transacitonAmount
+	 * 		The transaction amount to be validated
+	 * @return boolean
+	 */
+	public static boolean validateTransactionAmount(String transactionAmount){
+		pattern = Pattern.compile(AMOUNT_PATTERN);
+		matcher = pattern.matcher(transactionAmount);
+		
+		return matcher.matches();
+	}
+	
+	/**
+	 * Validates Account
+	 * 
+	 * @param toAccount
+	 * 		Validates the account for transfer
+	 * @return boolean
+	 */
+	public static boolean validateTransferToAccount(String transferAccountEmail){
+		pattern = Pattern.compile(EMAIL_PATTERN);
+		matcher = pattern.matcher(transferAccountEmail);
+		
+		return matcher.matches();
+	}
+
+     /** Validates internal role
      * 
      * @param role
      *            The role to be validated

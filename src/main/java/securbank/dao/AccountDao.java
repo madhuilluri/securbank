@@ -13,5 +13,6 @@ import java.util.*;
 public interface AccountDao extends BaseDao<Account, UUID> {
 	public List<Account> findAll();
 	public boolean accountExistsbyType(User user, String type);
-
+	public boolean updateBalance();
+	public boolean accountExists(Account account);
 }

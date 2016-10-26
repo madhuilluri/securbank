@@ -1,5 +1,6 @@
 package securbank.dao;
 
+import securbank.models.Account;
 import securbank.models.Transaction;
 
 import java.util.*;
@@ -12,7 +13,12 @@ import java.util.*;
 
 public interface TransactionDao extends BaseDao<Transaction, UUID>{
 	public List<Transaction> findAll();
-	public Transaction findByAccount(String accountNumber);
-	public Transaction findByAccountAndType(String accountNumber, String type);
-	public Transaction findByStatus(Boolean criticalStatus);
+	public List<Transaction> findByAccount(String accountNumber);
+	public List<Transaction> findByAccountAndType(Long accountNumber, String type);
+	public List<Transaction> findByCriticalStatus(Boolean criticalStatus);
+	public List<Transaction> findByApprovalStatus(String status);
+	public List<Transaction> findPendingByAccountAndType(Account account, String type);
+	public List<Transaction> findPendingByCriticalStatus(Boolean criticalStatus);
+	public List<Transaction> findPendingByAccount(Long accountNumber);
+	public Transaction findPendingTransactionByAccount(Long accountNumber);
 }

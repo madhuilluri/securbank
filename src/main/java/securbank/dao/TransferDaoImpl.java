@@ -7,7 +7,9 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
+import securbank.models.Account;
 import securbank.models.Transfer;
+import securbank.models.User;
 
 /**
  * @author Mitikaa Sama
@@ -44,15 +46,15 @@ public class TransferDaoImpl extends BaseDaoImpl<Transfer, UUID> implements Tran
      * @return transfers
      */
 	@Override
-	public Transfer findTransferByFromAccount(String fromAccountnumber) {
+	public List<Transfer> findTransferByFromAccount(Account account) {
 		try {
-			return (Transfer) this.entityManager.createQuery("SELECT transfer from Transfer transfer"
-					+ " where transfer.fromAccountnumber = :accountNumber")
-					.setParameter("fromAccountnumber", fromAccountnumber)
-					.getSingleResult();
+			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
+					+ " where transfer.fromAccount = :account", Transfer.class)
+					.setParameter("account", account)
+					.getResultList();
 		}
 		catch(NoResultException e) {
-			// returns null if no trasnfer is found
+			// returns null if no transfer is found
 			return null;
 		}
 	}
@@ -63,12 +65,12 @@ public class TransferDaoImpl extends BaseDaoImpl<Transfer, UUID> implements Tran
      * @return transfers
      */
 	@Override
-	public Transfer findTransferByToAccount(String toAccountnumber) {
+	public List<Transfer> findTransferByToAccount(Account toAccountnumber) {
 		try {
-			return (Transfer) this.entityManager.createQuery("SELECT transfer from Transfer transfer"
-					+ " where transfer.toAccountnumber = :toAccountnumber")
+			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
+					+ " where transfer.toAccountnumber = :toAccountnumber", Transfer.class)
 					.setParameter("toAccountnumber", toAccountnumber)
-					.getSingleResult();
+					.getResultList();
 		}
 		catch(NoResultException e) {
 			// returns null if no trasnfer is found
@@ -76,5 +78,47 @@ public class TransferDaoImpl extends BaseDaoImpl<Transfer, UUID> implements Tran
 		}
 	}
 
+	@Override
+	public List<Transfer> findByApprovalStatus(String status) {
+		try {
+			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
+					+ " where transfer.status = :status", Transfer.class)
+					.setParameter("status", status)
+					.getResultList();
+		}
+		catch(NoResultException e) {
+			// returns null if no transfer is found
+			return null;
+		}
+	}
+
+	@Override
+	public List<Transfer> findPendingTransferByFromAccount(Account fromAccount) {
+		try {
+			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
+					+ " where transfer.fromAccount = :account AND transfer.status = :status", Transfer.class)
+					.setParameter("account", fromAccount)
+					.setParameter("status", "Pending")
+					.getResultList();
+		}
+		catch(NoResultException e) {
+			// returns null if no transfer is found
+			return null;
+		}
+	}
 	
+	@Override
+	public List<Transfer> findByUserAndApprovalStatus(User user, String status) {
+		try {
+			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
+					+ " where transfer.status = :status AND (transfer.toAccount.user = :user OR transfer.fromAccount.user = :user)", Transfer.class)
+					.setParameter("status", status)
+					.setParameter("user", user)
+					.getResultList();
+		}
+		catch(NoResultException e) {
+			// returns null if no transfer is found
+			return null;
+		}
+	}
 }

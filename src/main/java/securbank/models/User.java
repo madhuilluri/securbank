@@ -17,11 +17,14 @@ import javax.validation.constraints.Size;
 import javax.persistence.CascadeType; 
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.LocalDateTime;
+
+import securbank.models.LoginAttempt;
 
 /**
  * @author Ayush Gupta
@@ -113,6 +116,10 @@ public class User {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<Account> accounts = new HashSet<Account>(0);
 
+	/**One to one relationship */
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private LoginAttempt loginAttempt;
+	
 	/** One to many relation ship  */
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<ModificationRequest> modificationRequest = new HashSet<ModificationRequest>(0);
@@ -153,7 +160,9 @@ public class User {
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
 			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
 			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts,
-			Set<ModificationRequest> modificationRequest, String publicKey) {
+			Set<ModificationRequest> modificationRequest, LoginAttempt attempt, String publicKey) {
+
+
 		super();
 		this.userId = userId;
 		this.role = role;
@@ -176,6 +185,7 @@ public class User {
 		this.lastLogin = lastLogin;
 		this.active = active;
 		this.accounts = accounts;
+		this.loginAttempt = attempt;
 		this.modificationRequest = modificationRequest;
 		this.publicKey = publicKey;
 	}
@@ -481,6 +491,14 @@ public class User {
 	public void setAccounts(Set<Account> accounts) {
 		this.accounts = accounts;
 	}
+	
+	public void setLoginAttempt(LoginAttempt attempt){
+		this.loginAttempt=attempt;
+	}
+	
+	public LoginAttempt getLoginAttempt(){
+		return loginAttempt;
+	}
 
 	/**
 	 * @return the modificationRequest
@@ -515,6 +533,6 @@ public class User {
 				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
 				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
 				+ ", active=" + active + ", accounts=" + accounts + ", modificationRequest=" + modificationRequest
-				+ ", publicKey =" + publicKey + "]";
+				+ ", publicKey =" + publicKey + ", loginAttempt=" + loginAttempt +"]";
 	}
 }

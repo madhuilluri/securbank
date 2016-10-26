@@ -4,50 +4,154 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
 <title>Edit Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
 </head>
 <body>
-	<form action="#" th:action="@{/admin/edit}" th:object="${user}"
-		method="post">
-		<p>
-			Username: <input type="text" th:field="*{username}" readonly="true" />
-		</p>
-		<p>
-			Email: <input type="text" th:field="*{email}" />
-		<p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
-		</p>
-		<p>
-			First Name: <input type="text" th:field="*{firstName}" />
-		<p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
-		</p>
-		<p>
-			Last Name: <input type="text" th:field="*{lastName}" />
-		<p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
-		</p>
-		<p>
-			Phone: <input type="text" th:field="*{phone}" />
-		<p th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
-		</p>
-		<p>
-			Address Line1: <input type="text" th:field="*{addressLine1}" />
-		<p th:if="${#fields.hasErrors('addressLine1')}"
-			th:errors="*{addressLine1}"></p>
-		</p>
-		<p>
-			City: <input type="text" th:field="*{city}" />
-		<p th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></p>
-		</p>
-		<p>
-			Zip: <input type="text" th:field="*{zip}" />
-		<p th:if="${#fields.hasErrors('zip')}" th:errors="*{zip}"></p>
-		</p>
-		<p>
-			State: <input type="text" th:field="*{state}" />
-		<p th:if="${#fields.hasErrors('state')}" th:errors="*{state}"></p>
-		</p>
-		<p>
-			<input type="submit" value="Submit" /> <input type="reset"
-				value="Reset" />
-		</p>
-	</form>
+
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+		      <li><a th:href="@{/admin/details}">My Dashboard</a></li>
+		      <li><a th:href="@{/logout}">Logout</a></li>
+		    </ul>
+		</div>
+</nav>
+
+	<div class="alert alert-danger" th:if="${param.error}"></div>
+
+	<div class="container">
+		<form class="form-horizontal" action="#" th:action="@{/admin/edit}"
+			th:object="${user}" method="post">
+			<fieldset>
+
+				<!-- Form Name -->
+				<legend>Edit Admin Profile</legend>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">Username</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" required="" th:field="*{username}" readonly="true"/>
+					</div>
+				</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">First
+						Name</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" th:field="*{firstName}" />
+							<div class="alert alert-danger"
+								th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+					</div>
+				</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">Last
+						Name</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" required="" th:field="*{lastName}" />
+							<div class="alert alert-danger"
+								th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+					</div>
+				</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">E-mail</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" th:field="*{email}" />
+						<div class="alert alert-danger"
+							th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+					</div>
+				</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">Phone
+						Number</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" required="" th:field="*{phone}" />
+						<div class="alert alert-danger"
+							th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+					</div>
+				</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">Address
+						Line 1</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" required=""
+							th:field="*{addressLine1}" />
+							<div class="alert alert-danger"
+								th:if="${#fields.hasErrors('addressLine1')}" th:errors="*{addressLine1}"></div>
+					</div>
+				</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">City</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" required="" th:field="*{city}" />
+							<div class="alert alert-danger"
+								th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></div>
+					</div>
+				</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">State</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" required="" th:field="*{state}" />
+							<div class="alert alert-danger"
+								th:if="${#fields.hasErrors('state')}" th:errors="*{state}"></div>
+					</div>
+				</div>
+
+				<!-- Text input-->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="textinput">Zipcode</label>
+					<div class="col-md-4">
+						<input id="textinput" name="textinput" type="text" placeholder=""
+							class="form-control input-md" th:field="*{zip}" />
+						<div class="alert alert-danger"
+							th:if="${#fields.hasErrors('zip')}" th:errors="*{zip}"></div>
+					</div>
+				</div>
+
+
+				<!-- Button -->
+				<div class="form-group">
+					<label class="col-md-4 control-label" for="submitbutton"></label>
+					<div class="col-md-8">
+						<button id="submitbutton" name="submitbutton" type="submit"
+							class="btn btn-primary">Submit</button>
+						<button id="resetbutton" name="resetbutton" type="reset"
+							class="btn btn-default">Reset</button>
+					</div>
+				</div>
+
+			</fieldset>
+		</form>
+	</div>
+
 </body>
 </html>

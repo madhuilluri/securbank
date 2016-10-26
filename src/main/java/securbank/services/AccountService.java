@@ -11,4 +11,5 @@ import securbank.models.Account;
  */
 public interface AccountService {
 	public Account createAccount(Account account);
+	public boolean accountExists(Account account);
 }

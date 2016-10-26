@@ -1,21 +1,19 @@
 package securbank.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import securbank.authentication.CustomAuthenticationProvider;
-import securbank.controller.CommonController;
-import securbank.services.AuthenticationServiceImpl;
-
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import securbank.authentication.CustomAuthenticationSuccessHandler;
 
 /**
  * @author Ayush Gupta
@@ -24,6 +22,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	@Autowired
+	CustomAuthenticationSuccessHandler authSuccessHandler;
 	
 	@Autowired
 	private CustomAuthenticationProvider customAuthenticationProvider;
@@ -53,6 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	        .and()
         .formLogin()
             .loginPage("/login")
+            .successHandler(authSuccessHandler)
             //.failureForwardUrl("/login?error")
             .permitAll()
             
@@ -70,5 +72,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public AuthenticationTrustResolver trustResolver() {
+        return new AuthenticationTrustResolverImpl();
     }
 }

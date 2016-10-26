@@ -11,6 +11,20 @@
 <script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
 </head>
 <body>
+
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+					<li><a th:href="@{/admin/details}">My Dashboard</a></li>
+					<li><a th:href="@{/logout}">Logout</a></li>
+				</ul>
+		</div>
+	</nav>
+
 	<div class="container">
 		<h3 th:text="${user.firstName+' '+user.lastName+'s Profile'}"></h3>
 	</div>
@@ -58,8 +72,9 @@
 					</tr>
 				</tbody>
 			</table>
-			<input type="submit" value="Delete" />
-		</form> 
+			<button id="deletbutton" name="deletebutton" type="submit"
+				class="btn btn-danger">Delete</button>
+		</form>
 	</div>
 
 </body>

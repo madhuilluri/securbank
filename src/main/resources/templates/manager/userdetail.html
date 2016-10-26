@@ -3,30 +3,73 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-<title>Spring Security Example</title>
+<title>User Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
 </head>
 <body>
-	<div th:object="${user}">
-		<p>Username:
-		<p th:text="*{username}" /></p>
-		<p>Email:
-		<p th:text="*{email}" /></p>
-		<p>First Name:
-		<p th:text="*{firstName}" /></p>
-		<p>Last Name:
-		<p th:text="*{lastName}" /></p>
-		<p>Phone:
-		<p th:text="*{phone}" /></p>
-		<p>Address Line1:
-		<p th:text="*{addressLine1}" /></p>
-		<p>City:
-		<p th:text="*{city}" /></p>
-		<p>Zip:
-		<p th:text="*{zip}" /></p>
-		<p>State:
-		<p th:text="*{state}" /></p>
-		<p>Role:
-		<p th:text="*{role}" /></p>
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+					<li><a th:href="@{/manager/details}">My Dashboard</a></li>
+					<li><a th:href="@{/logout}">Logout</a></li>
+				</ul>
+		</div>
+	</nav>
+
+	<div class="container">
+		<h3 th:text="${user.firstName+' '+user.lastName+'s Profile'}"></h3>
 	</div>
+
+	<div class="container">
+		<table class="table table-user-information">
+			<tbody>
+				<tr>
+					<td>Username</td>
+					<td th:text="${user.username}"></td>
+				</tr>
+				<tr>
+					<td>Full Name</td>
+					<td th:text="${user.firstName}+' '+${user.lastName}"></td>
+				</tr>
+				<tr>
+					<td>Email</td>
+					<td th:text="${user.email}"></td>
+				</tr>
+				<tr>
+					<td>Address Line 1</td>
+					<td th:text="${user.addressLine1}"></td>
+				</tr>
+				<tr>
+					<td>Address Line 2</td>
+					<td th:text="${user.addressLine2}"></td>
+				</tr>
+				<tr>
+					<td>City</td>
+					<td th:text="${user.city}"></td>
+				</tr>
+				<tr>
+					<td>State</td>
+					<td th:text="${user.state}"></td>
+				</tr>
+				<tr>
+					<td>Zip Code</td>
+					<td th:text="${user.zip}"></td>
+				</tr>
+				<tr>
+					<td>Role</td>
+					<td th:text="${user.role}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
 </body>
 </html>

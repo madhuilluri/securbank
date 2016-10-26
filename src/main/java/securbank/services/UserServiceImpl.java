@@ -26,6 +26,7 @@ import securbank.models.ChangePasswordRequest;
 import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
+import securbank.models.LoginAttempt;
 
 /**
  * @author Ayush Gupta
@@ -77,6 +78,9 @@ public class UserServiceImpl implements UserService {
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(false);
 		user.setType("external");
+		
+		LoginAttempt attempt = new LoginAttempt(user, 0, LocalDateTime.now());		
+		user.setLoginAttempt(attempt);
 		user = userDao.save(user);
 		
 		//setup up email message
@@ -118,6 +122,12 @@ public class UserServiceImpl implements UserService {
 			logger.info("Invalid request for new internal user");
 			return null;
 		}
+
+		LoginAttempt attempt = new LoginAttempt();
+		attempt.setLastUpdated(LocalDateTime.now());
+		attempt.setCounter(0);
+		user.setLoginAttempt(attempt);
+		user = userDao.save(user);
 		
 		// Deactivates request
 		newUserRequest.setActive(false);
@@ -307,7 +317,7 @@ public class UserServiceImpl implements UserService {
 		logger.info("Getting new user request by id");
 		return newUserRequest;
 	}
-	
+
 	/**
      * Creates external user modification request
      * 
@@ -618,6 +628,25 @@ public class UserServiceImpl implements UserService {
 		modificationRequestDao.remove(request);
 		return;
 	}
+
+	/* (non-Javadoc)
+	 * @see securbank.services.UserService#getUserByUsernameOrEmail(java.lang.String)
+	 */
+	@Override
+	public User getUserByUsernameOrEmail(String email) {
+		return userDao.findByUsernameOrEmail(email);
+	}
+
+	/* (non-Javadoc)
+	 * @see securbank.services.UserService#getModificationRequestsByUsers(java.lang.String, java.lang.String, securbank.models.User)
+	 */
+	@Override
+	public List<ModificationRequest> getModificationRequestsByUsers(String status, String type, List<User> users) {
+		logger.info("Getting all modification request by user type, status of request and users");
+		
+		return modificationRequestDao.findAllbyStatusAndUserTypeAndUsers(status, type, users);
+
+	}
 	
 	@Override
 	public boolean verifyCurrentPassword(User user, String password) {
@@ -633,5 +662,10 @@ public class UserServiceImpl implements UserService {
 		userDao.update(user);
 		
 		return user;			
+	}
+
+	@Override
+	public User getUserByEmail(String email) {
+		return userDao.findByUsernameOrEmail(email);
 	}
 }

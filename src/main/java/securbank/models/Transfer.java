@@ -10,11 +10,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.joda.time.LocalDateTime;
@@ -37,15 +38,27 @@ public class Transfer {
 	@Column(name = "transferId", unique = true, nullable = false, columnDefinition = "BINARY(16)")
 	private UUID transferId;
 	
-	@NotNull
+	/*@NotNull
 	@Size(min = 8, max = 8)
 	@Column(name = "fromAccountNumber", unique = false, nullable = false, updatable = false)
-	private String fromAccountNumber;
+	private String fromAccountNumber;*/
 	
-	@NotNull
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "fromAccount", nullable = false, updatable = false)
+	private Account fromAccount;
+	
+	/*@NotNull
 	@Size(min = 8, max = 8)
 	@Column(name = "toAccountNumber", unique = false, nullable = false, updatable = false)
-	private String toAccountNumber;
+	private String toAccountNumber;*/
+	
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "toAccount", nullable = false, updatable = false)
+	private Account toAccount;
+	
+	@NotNull
+	@Column(name = "amount", unique = false, nullable = false, updatable = false)
+	private double amount;
 	
 	@NotNull
 	@Column(name = "status", unique = false, nullable = false)
@@ -58,9 +71,9 @@ public class Transfer {
 	@Column(name = "modifiedOn", nullable = true, updatable = true)
 	private LocalDateTime modifiedOn;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@Column(name = "userId", nullable = true, updatable = true)
-	private Set<User> modifiedBy = new HashSet<User>(0);
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "userId", nullable = true)
+	private User modifiedBy;
 
 	@NotNull
 	@Column(name = "active", nullable = false, columnDefinition = "BIT")
@@ -69,30 +82,46 @@ public class Transfer {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "transfer")
 	private Set<Transaction> transactions = new HashSet<Transaction>(0);
 
+	@Transient
+	@Column(name = "otp")
+	private String otp;
+	
+	public Transfer(){
+		
+	}
+
+	
+	
 	/**
 	 * @param transferId
-	 * @param fromAccountNumber
-	 * @param toAccountNumber
+	 * @param fromAccount
+	 * @param toAccount
+	 * @param amount
 	 * @param status
-	 * @param transactions
 	 * @param createdOn
 	 * @param modifiedOn
 	 * @param modifiedBy
-	 * @param active 
+	 * @param active
+	 * @param transactions
+	 * @param otp
 	 */
-	public Transfer(UUID transferId, String fromAccountNumber, String toAccountNumber,  
-			String status, Set<Transaction> transactions, LocalDateTime createdOn, LocalDateTime modifiedOn, 
-			Set<User> modifiedBy, Boolean active){
+	public Transfer(UUID transferId, Account fromAccount, Account toAccount, double amount, String status,
+			LocalDateTime createdOn, LocalDateTime modifiedOn, User modifiedBy, Boolean active,
+			Set<Transaction> transactions, String otp) {
 		this.transferId = transferId;
-		this.fromAccountNumber = fromAccountNumber;
-		this.toAccountNumber = toAccountNumber;
+		this.fromAccount = fromAccount;
+		this.toAccount = toAccount;
+		this.amount = amount;
 		this.status = status;
 		this.createdOn = createdOn;
 		this.modifiedOn = modifiedOn;
 		this.modifiedBy = modifiedBy;
-		this.transactions = transactions;
 		this.active = active;
+		this.transactions = transactions;
+		this.otp = otp;
 	}
+
+
 
 	/**
 	 * @return the transferId
@@ -102,17 +131,24 @@ public class Transfer {
 	}
 
 	/**
-	 * @return the fromAccountNumber
+	 * @return the fromAccount
 	 */
-	public String getFromAccountNumber() {
-		return fromAccountNumber;
+	public Account getFromAccount() {
+		return fromAccount;
 	}
 
 	/**
 	 * @return the toAccountNumber
 	 */
-	public String getToAccountNumber() {
-		return toAccountNumber;
+	public Account getToAccount() {
+		return toAccount;
+	}
+
+	/**
+	 * @return the amount
+	 */
+	public double getAmount() {
+		return amount;
 	}
 
 	/**
@@ -130,6 +166,34 @@ public class Transfer {
 	}
 
 	/**
+	 * @return the modifiedOn
+	 */
+	public LocalDateTime getModifiedOn() {
+		return modifiedOn;
+	}
+
+	/**
+	 * @return the modifiedBy
+	 */
+	public User getModifiedBy() {
+		return modifiedBy;
+	}
+
+	/**
+	 * @return the active
+	 */
+	public Boolean getActive() {
+		return active;
+	}
+
+	/**
+	 * @return the transactions
+	 */
+	public Set<Transaction> getTransactions() {
+		return transactions;
+	}
+
+	/**
 	 * @param transferId the transferId to set
 	 */
 	public void setTransferId(UUID transferId) {
@@ -137,17 +201,25 @@ public class Transfer {
 	}
 
 	/**
-	 * @param fromAccountNumber the fromAccountNumber to set
+	 * @param fromAccount
+	 *  the fromAccount to set
 	 */
-	public void setFromAccountNumber(String fromAccountNumber) {
-		this.fromAccountNumber = fromAccountNumber;
+	public void setFromAccount(Account fromAccount) {
+		this.fromAccount = fromAccount;
 	}
 
 	/**
 	 * @param toAccountNumber the toAccountNumber to set
 	 */
-	public void setToAccountNumber(String toAccountNumber) {
-		this.toAccountNumber = toAccountNumber;
+	public void setToAccount(Account toAccount) {
+		this.toAccount = toAccount;
+	}
+
+	/**
+	 * @param amount the amount to set
+	 */
+	public void setAmount(double amount) {
+		this.amount = amount;
 	}
 
 	/**
@@ -164,14 +236,59 @@ public class Transfer {
 		this.createdOn = createdOn;
 	}
 
+	/**
+	 * @param modifiedOn the modifiedOn to set
+	 */
+	public void setModifiedOn(LocalDateTime modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
+
+	/**
+	 * @param modifiedBy the modifiedBy to set
+	 */
+	public void setModifiedBy(User modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+	/**
+	 * @param transactions the transactions to set
+	 */
+	public void setTransactions(Set<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
+	/**
+	 * @return the otp
+	 */
+	public String getOtp() {
+		return otp;
+	}
+
+	/**
+	 * @param otp the otp to set
+	 */
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Transfer [transferId=" + transferId + ", fromAccountNumber=" + fromAccountNumber + ", toAccountNumber="
-				+ toAccountNumber + ", status=" + status + ", createdOn=" + createdOn + "]";
+		return "Transfer [transferId=" + transferId + ", fromAccount=" + fromAccount + ", toAccount=" + toAccount
+				+ ", amount=" + amount + ", status=" + status + ", createdOn=" + createdOn + ", modifiedOn="
+				+ modifiedOn + ", modifiedBy=" + modifiedBy + ", active=" + active + ", transactions=" + transactions
+				+ ", otp=" + otp + "]";
 	}
-
 	
 }
+	
+	

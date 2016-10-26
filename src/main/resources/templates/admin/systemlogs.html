@@ -11,6 +11,19 @@
 <script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
 </head>
 <body>
+
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+		      <li><a th:href="@{/admin/details}">My Dashboard</a></li>
+		      <li><a th:href="@{/logout}">Logout</a></li>
+		    </ul>
+		</div>
+</nav>
 	<div class="container">
 		<h3>Admin Dashboard</h3>
 		<ul class="nav nav-tabs nav-justified">
@@ -18,6 +31,7 @@
 			<li><a th:href="@{/admin/user/add}">Create Internal User
 					Account</a></li>
 			<li><a th:href="@{/admin/details}">My Profile</a></li>
+			<li><a th:href="@{/admin/user/request}">New Internal User Requests</a></li>
 			<li class="active"><a href="#">System Logs</a></li>
 		</ul>
 	</div>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>Account Access Request</title>
+</head>
+<body>
+	<form action="#"
+		th:action="@{/manager/employee/request/{id}(id=${viewrequest.id})}"
+		th:object="${viewrequest}" method="post">
+		<div>
+			<h3>Employee</h3>
+			<p>Email:
+			<p th:text="*{employee.email}" /></p>
+			<p>First Name:
+			<p th:text="*{employee.firstName}" /></p>
+			<p>Last Name:
+			<p th:text="*{employee.lastName}" /></p>
+		</div>
+		<div>
+			<h3>External</h3>
+			<p>Email:
+			<p th:text="*{external.email}" /></p>
+			<p>First Name:
+			<p th:text="*{external.firstName}" /></p>
+			<p>Last Name:
+			<p th:text="*{external.lastName}" /></p>
+		</div>
+		<p>
+			<input type="radio" th:field="*{status}" th:value="approved">Approve</input>
+		</p>
+		<p>
+			<input type="radio" th:field="*{status}" th:value="rejected"
+				th:checked="1">Reject</input>
+		</p>
+		<p>
+			<input type="submit" value="Submit" /> <input type="reset"
+				value="Reset" />
+		</p>
+	</form>
+</body>
+</html>

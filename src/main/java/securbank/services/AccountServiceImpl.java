@@ -35,4 +35,9 @@ public class AccountServiceImpl implements AccountService {
 		
 		return accountDao.save(account);
 	}
+
+	@Override
+	public boolean accountExists(Account account) {
+		return accountDao.accountExists(account);
+	}
 }

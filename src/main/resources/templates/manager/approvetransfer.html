@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>Transfer Approval</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+</head>
+<body>
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+					<li><a th:href="@{/manager/details}">My Dashboard</a></li>
+					<li><a th:href="@{/logout}">Logout</a></li>
+				</ul>
+		</div>
+	</nav>
+
+	<div class="container">
+		<h3>Transfer Approval Page</h3>
+	</div>
+
+	<form class="form-horizontal" action="#"
+		th:action="@{/manager/transfer/request/{id}(id=${transfer.transferId})}"
+		th:object="${transfer}" method="post">
+	<div class="container">
+		<table class="table table-user-information">
+			<tbody>
+				<tr>
+					<td>From Account</td>
+					<td th:text="${transfer.fromAccount.accountNumber}"></td>
+				</tr>
+				<tr>
+					<td>To Account</td>
+					<td th:text="${transfer.toAccount.accountNumber}"></td>
+				</tr>
+				<tr>
+					<td>Amount</td>
+					<td th:text="${transfer.amount}"></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="form-group">
+			<div class="col-md-4">
+				<div class="radio">
+					<label for="radios-0">
+						<input type="radio" name="radios" id="radios-0" th:field="*{status}" th:value="approved">
+						Approve</input>
+					</label>
+				</div>
+				<div class="radio">
+					<label for="radios-1">
+						<input type="radio" name="radios" id="radios-1" th:field="*{status}" th:value="rejected"
+						th:checked="1">
+						Reject</input>
+					</label>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Button -->
+		<div class="form-group">
+			<div class="col-md-8">
+				<button id="submitbutton" name="submitbutton" type="submit"
+				class="btn btn-primary">Submit</button>
+				<button id="resetbutton" name="resetbutton" type="reset"
+				class="btn btn-default">Reset</button>
+			</div>
+		</div>
+	</div>
+</form>
+</body>
+</html>

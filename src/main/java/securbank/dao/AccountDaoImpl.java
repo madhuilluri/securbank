@@ -35,7 +35,7 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 	
 	/**
      * Returns if account exists for user
-     * 
+     *  
      * @param user
      * 			The user for which account to check
      * @param type
@@ -47,6 +47,21 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 		return this.entityManager.createQuery("SELECT COUNT(account) from Account account where (account.user = :user AND account.type = :type AND account.active = true)", Long.class)
 				.setParameter("user", user)
 				.setParameter("type", type)
+				.getSingleResult() != 0;
+	}
+
+	
+	
+	@Override
+	public boolean updateBalance() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accountExists(Account account) {
+		return this.entityManager.createQuery("SELECT COUNT(account) from Account account where (account.accountNumber = :accountNumber)", Long.class)
+				.setParameter("accountNumber", account.getAccountNumber())
 				.getSingleResult() != 0;
 	}
 	
