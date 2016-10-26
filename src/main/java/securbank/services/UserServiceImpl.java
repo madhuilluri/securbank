@@ -23,9 +23,7 @@ import securbank.models.Account;
 import securbank.models.ChangePasswordRequest;
 import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
-import securbank.models.Pii;
 import securbank.models.User;
-import securbank.models.LoginAttempt;
 
 /**
  * @author Ayush Gupta
@@ -69,20 +67,12 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User createExternalUser(User user) {
-		Pii pii = user.getPii();
 		logger.info("Creating new external user");
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(false);
 		user.setType("external");
-		
-		LoginAttempt attempt = new LoginAttempt(user, 0, LocalDateTime.now());		
-		user.setLoginAttempt(attempt);
 		user = userDao.save(user);
-		
-		//setup personal information
-		pii.setUser(user);
-		pii.setSsn(pii.getSsn());
 		
 		//setup up email message
 		message = new SimpleMailMessage();
@@ -111,12 +101,6 @@ public class UserServiceImpl implements UserService {
 			logger.info("Invalid request for new internal user");
 			return null;
 		}
-
-		LoginAttempt attempt = new LoginAttempt();
-		attempt.setLastUpdated(LocalDateTime.now());
-		attempt.setCounter(0);
-		attempt.setUser(user);
-		user.setLoginAttempt(attempt);
 		
 		// Deactivates request
 		newUserRequest.setActive(false);
@@ -125,7 +109,12 @@ public class UserServiceImpl implements UserService {
 		logger.info("Creating new internal user");
 		
 		// creates new user
-		user.setType("internal");
+		if (user.getRole().equalsIgnoreCase("ROLE_ADMIN")) {
+			user.setType("admin");
+		}
+		else {
+			user.setType("internal");			
+		}
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(true);
@@ -306,6 +295,7 @@ public class UserServiceImpl implements UserService {
 		logger.info("Getting new user request by id");
 		return newUserRequest;
 	}
+	
 
 	/**
      * Creates external user modification request
@@ -617,25 +607,6 @@ public class UserServiceImpl implements UserService {
 		modificationRequestDao.remove(request);
 		return;
 	}
-
-	/* (non-Javadoc)
-	 * @see securbank.services.UserService#getUserByUsernameOrEmail(java.lang.String)
-	 */
-	@Override
-	public User getUserByUsernameOrEmail(String email) {
-		return userDao.findByUsernameOrEmail(email);
-	}
-
-	/* (non-Javadoc)
-	 * @see securbank.services.UserService#getModificationRequestsByUsers(java.lang.String, java.lang.String, securbank.models.User)
-	 */
-	@Override
-	public List<ModificationRequest> getModificationRequestsByUsers(String status, String type, List<User> users) {
-		logger.info("Getting all modification request by user type, status of request and users");
-		
-		return modificationRequestDao.findAllbyStatusAndUserTypeAndUsers(status, type, users);
-
-	}
 	
 	@Override
 	public boolean verifyCurrentPassword(User user, String password) {
@@ -655,6 +626,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User getUserByEmail(String email) {
+		return userDao.findByUsernameOrEmail(email);
+	}
+
+	/* (non-Javadoc)
+	 * @see securbank.services.UserService#getModificationRequestsByUsers(java.lang.String, java.lang.String, securbank.models.User)
+	 */
+	@Override
+	public List<ModificationRequest> getModificationRequestsByUsers(String status, String type, List<User> users) {
+		logger.info("Getting all modification request by user type, status of request and users");
+		
+		return modificationRequestDao.findAllbyStatusAndUserTypeAndUsers(status, type, users);
+
+	}
+
+	@Override
+	public User getUserByUsernameOrEmail(String email) {
 		return userDao.findByUsernameOrEmail(email);
 	}
 }
