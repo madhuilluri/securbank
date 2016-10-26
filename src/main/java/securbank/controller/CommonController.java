@@ -27,6 +27,7 @@ import securbank.dao.UserDao;
 import securbank.exceptions.Exceptions;
 import securbank.models.CreatePasswordRequest;
 import securbank.models.ForgotPasswordRequest;
+import securbank.models.Pii;
 import securbank.models.ChangePasswordRequest;
 
 import securbank.dao.UserDao;
@@ -123,10 +124,12 @@ public class CommonController {
 
 			return "signup";
 		}
-
+		Pii pii = new Pii();
 		logger.info("POST request: signup");
 		logger.info("Username: " + user.getUsername());
-
+		logger.info("user_id " + user.getUserId());
+		logger.info("pii " + pii.getpId());
+		
 		userService.createExternalUser(user);
 
 		return "redirect:/";

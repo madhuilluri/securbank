@@ -52,13 +52,13 @@ public class GlobalExceptionController {
 		return model;
 
 	}
-
-	@ExceptionHandler(Exception.class)
-	public ModelAndView handleAllException(Exception ex) {
-
-		ModelAndView model = new ModelAndView("error/genericError");
-		model.addObject("400", "Bad Request");
-
-		return model;
-	}
+//
+//	@ExceptionHandler(Exception.class)
+//	public ModelAndView handleAllException(Exception ex) {
+//
+//		ModelAndView model = new ModelAndView("error/genericError");
+//		model.addObject("400", "Bad Request");
+//
+//		return model;
+//	}
 }

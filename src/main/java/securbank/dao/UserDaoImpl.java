@@ -158,7 +158,7 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
 
 	@Override
 	public List<User> accessPii() {
-		return this.entityManager.createQuery("SELECT username,user.pii.ssn from User user where user.active=true", User.class)
+		return this.entityManager.createQuery("SELECT user from User user where user.active=true", User.class)
 											.getResultList();
 	}
 }

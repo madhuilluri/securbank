@@ -383,10 +383,9 @@ public class AdminController {
 	@GetMapping("/admin/user/pii")
 	public String adminAccessPII(Model model){
 		List <User> userList = userService.ListAllPII();
-		if(userList==null){
-			return "redirect:/admin";
-		}
-		return "redirect:/admin";
+		model.addAttribute("users", userList);
+		
+		return "admin/accesspii";
 	}
 
 }
