@@ -460,6 +460,7 @@ public class EmployeeController {
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getApprovalStatus())){
+			transaction.setAmount(trans.getAmount());
 			if(transactionService.isTransactionValid(transaction)==false && transaction.getType().equals("DEBIT")){
 				return "redirect:/error?code=404&path=amount-invalid";
 			}
