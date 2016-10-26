@@ -34,20 +34,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
-
+import securbank.models.ViewAuthorization;
 import securbank.services.AccountService;
 import securbank.services.OtpService;
-import securbank.models.ViewAuthorization;
-import securbank.services.UserService;
-import securbank.services.ViewAuthorizationService;
+import securbank.services.PDFService;
 import securbank.services.TransactionService;
 import securbank.services.TransferService;
-import securbank.validators.NewTransactionFormValidator;
-import securbank.validators.NewTransferFormValidator;
+import securbank.services.UserService;
+import securbank.services.ViewAuthorizationService;
 import securbank.validators.EditUserFormValidator;
 import securbank.validators.NewMerchantPaymentFormValidator;
+import securbank.validators.NewTransactionFormValidator;
+import securbank.validators.NewTransferFormValidator;
 import securbank.validators.NewUserFormValidator;
-import securbank.view.CreatePDF;
 
 
 /**
@@ -58,6 +57,9 @@ import securbank.view.CreatePDF;
 public class MerchantController {
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	PDFService pdfService;
 	
 	@Autowired
 	private TransactionService transactionService;
@@ -396,16 +398,13 @@ public class MerchantController {
     }
 
 	@RequestMapping("/merchant/downloadPDF")
-	public String downloadPDF(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void downloadPDF(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		final ServletContext servletContext = request.getSession().getServletContext();
 		final File tempDirectory = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
 		final String temperotyFilePath = tempDirectory.getAbsolutePath();
 		
 		User user = userService.getCurrentUser();
-		if(user==null){
-			return "redirect:/login";
-		}
 
 		String fileName = "account_statement.pdf";
 		response.setContentType("application/pdf");
@@ -414,9 +413,9 @@ public class MerchantController {
 		
 		try {
 
-			CreatePDF.createPDF(temperotyFilePath + "\\" + fileName, user);
+			pdfService.createStatementPDF(temperotyFilePath + "\\" + fileName, user);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			baos = convertPDFToByteArrayOutputStream(temperotyFilePath + "\\" + fileName);
+			baos = pdfService.convertPDFToByteArrayOutputStream(temperotyFilePath + "\\" + fileName);
 			OutputStream os = response.getOutputStream();
 			baos.writeTo(os);
 			os.flush();
@@ -424,37 +423,5 @@ public class MerchantController {
 			e1.printStackTrace();
 		}
 		
-		return "redirect:/merchant/details";
-	}
-
-	private ByteArrayOutputStream convertPDFToByteArrayOutputStream(String fileName) {
-
-		InputStream inputStream = null;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try {
-
-			inputStream = new FileInputStream(fileName);
-			byte[] buffer = new byte[1024];
-			baos = new ByteArrayOutputStream();
-
-			int bytesRead;
-			while ((bytesRead = inputStream.read(buffer)) != -1) {
-				baos.write(buffer, 0, bytesRead);
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return baos;
 	}
 }

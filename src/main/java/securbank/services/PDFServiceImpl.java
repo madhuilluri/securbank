@@ -1,13 +1,21 @@
-package securbank.view;
+package securbank.services;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
 import securbank.models.Account;
+import securbank.models.Transaction;
 import securbank.models.User;
 
 import com.itextpdf.text.Document;
@@ -20,24 +28,49 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-/**
- * @author Amit Kumar
- *
- */
-public class CreatePDF {
-	public String TAG = getClass().toString() + " ";
-	private static Font TIME_ROMAN = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
-	private static Font TIME_ROMAN_SMALL = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
+@Service("pdfService")
+@Transactional
+public class PDFServiceImpl implements PDFService {
 
-	static Set<Account> accounts = new HashSet<Account>();
-	static Set<securbank.models.Transaction> transactions = new HashSet<securbank.models.Transaction>();
-	static int transactionCount = 20;
+	private final Font TIME_ROMAN = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+	private final Font TIME_ROMAN_SMALL = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 
-	/**
-	 * @param args
-	 */
-	public static Document createPDF(String file, User user) {
+	int transactionCount = 20;
+	
+	@Override
+	public ByteArrayOutputStream convertPDFToByteArrayOutputStream(String fileName) {
 
+		InputStream inputStream = null;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+
+			inputStream = new FileInputStream(fileName);
+			byte[] buffer = new byte[1024];
+			baos = new ByteArrayOutputStream();
+
+			int bytesRead;
+			while ((bytesRead = inputStream.read(buffer)) != -1) {
+				baos.write(buffer, 0, bytesRead);
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return baos;
+	}
+
+	@Override
+	public Document createStatementPDF(String file, User user) {
 		Document document = null;
 
 		try {
@@ -45,11 +78,11 @@ public class CreatePDF {
 			PdfWriter.getInstance(document, new FileOutputStream(file));
 			document.open();
 
-			addMetaData(document);
+			addStatementMetaData(document);
 
-			addTitlePage(document, user);
+			addStatementTitlePage(document, user);
 
-			createTable(document);
+			createStatementTable(document, user);
 
 			document.close();
 
@@ -60,17 +93,16 @@ public class CreatePDF {
 			e.printStackTrace();
 		}
 		return document;
-
 	}
 
-	private static void addMetaData(Document document) {
+	private void addStatementMetaData(Document document) {
 		document.addTitle("Generate PDF report");
 		document.addSubject("Generate PDF report");
 		document.addAuthor("Cardinal Bank System");
 		document.addCreator("Cardinal Bank System");
 	}
 
-	private static void addTitlePage(Document document, User user) throws DocumentException {
+	private void addStatementTitlePage(Document document, User user) throws DocumentException {
 
 		Paragraph preface = new Paragraph();
 		creteEmptyLine(preface, 1);
@@ -80,22 +112,9 @@ public class CreatePDF {
 		creteEmptyLine(preface, 1);
 		preface.add(new Paragraph("Name: ", TIME_ROMAN_SMALL) + user.getFirstName() + " " + user.getLastName());
 
-		accounts = user.getAccounts();
-		long acc_num = 0;
-		// System.out.println("total account: "+accounts.size());
-		for (Account acc : accounts) {
-			System.out.println("Type:  " + acc.getType());
-			if ("checking".equals(acc.getType())) {
-				System.out.println("Account number inisde if loop ");
-				acc_num = acc.getAccountNumber();
-				transactions = acc.getTransactions();
-
-			}
-		}
-
-		// System.out.println("Account number "+acc_num);
 		creteEmptyLine(preface, 1);
-		preface.add(new Paragraph("Account details: ", TIME_ROMAN_SMALL) + String.valueOf(acc_num));
+		preface.add(new Paragraph("Account details: ", TIME_ROMAN_SMALL)
+				+ String.valueOf(getCheckingAccount(user).getAccountNumber()));
 
 		creteEmptyLine(preface, 1);
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -104,13 +123,24 @@ public class CreatePDF {
 
 	}
 
-	private static void creteEmptyLine(Paragraph paragraph, int number) {
+	private void creteEmptyLine(Paragraph paragraph, int number) {
 		for (int i = 0; i < number; i++) {
 			paragraph.add(new Paragraph(" "));
 		}
 	}
 
-	private static void createTable(Document document) throws DocumentException {
+	private Account getCheckingAccount(User user) {
+		for (Account acc : user.getAccounts()) {
+			System.out.println("Type:  " + acc.getType());
+			if ("checking".equals(acc.getType())) {
+				System.out.println("Account number inisde if loop ");
+				return acc;
+			}
+		}
+		return null;
+	}
+
+	private void createStatementTable(Document document, User user) throws DocumentException {
 		Paragraph paragraph = new Paragraph();
 		creteEmptyLine(paragraph, 2);
 		document.add(paragraph);
@@ -130,7 +160,7 @@ public class CreatePDF {
 		table.setHeaderRows(1);
 
 		int i = 0;
-		for (securbank.models.Transaction trans : transactions) {
+		for (Transaction trans : getCheckingAccount(user).getTransactions()) {
 			if (i < transactionCount) {
 				table.setWidthPercentage(100);
 				table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
