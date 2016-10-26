@@ -35,6 +35,8 @@
 		</ul>
 	</div>
 
+	<div class="alert alert-success" th:if="${param.successEdit}">Successfuly edited profile</div>
+
 	<div class="container">
 		<h4 th:text="${user.firstName+' '+user.lastName+'s Profile'}"></h4>
 		<table class="table table-user-information">
