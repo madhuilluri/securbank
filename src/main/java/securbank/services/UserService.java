@@ -37,5 +37,6 @@ public interface UserService {
 	public boolean verifyCurrentPassword(User user,String password);
 	public User changeUserPassword(User user, ChangePasswordRequest model);
 	public User getUserByEmail(String email);
+	public List<User> ListAllPII();
 }
 
