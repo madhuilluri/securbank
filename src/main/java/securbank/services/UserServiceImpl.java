@@ -115,8 +115,8 @@ public class UserServiceImpl implements UserService {
 		LoginAttempt attempt = new LoginAttempt();
 		attempt.setLastUpdated(LocalDateTime.now());
 		attempt.setCounter(0);
+		attempt.setUser(user);
 		user.setLoginAttempt(attempt);
-		user = userDao.save(user);
 		
 		// Deactivates request
 		newUserRequest.setActive(false);

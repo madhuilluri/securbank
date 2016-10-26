@@ -118,12 +118,12 @@ public class TransferServiceImpl implements TransferService{
 		}
 		
 		//user types should be external
-		if(!"ROLE_INDIVIDUAL".equalsIgnoreCase(currentUser.getRole()) && !"ROLE_MERCHANT".equalsIgnoreCase(currentUser.getEmail())){
+		if((!"ROLE_INDIVIDUAL".equalsIgnoreCase(currentUser.getRole())) && (!"ROLE_MERCHANT".equalsIgnoreCase(currentUser.getRole()))){
 			logger.info("Current user is not an external user");
 			return null;
 		}
 		
-		if(!"ROLE_INDIVIDUAL".equalsIgnoreCase(transfer.getToAccount().getUser().getRole()) && !"ROLE_MERCHANT".equalsIgnoreCase(transfer.getToAccount().getUser().getRole())){
+		if((!"ROLE_INDIVIDUAL".equalsIgnoreCase(transfer.getToAccount().getUser().getRole())) && (!"ROLE_MERCHANT".equalsIgnoreCase(transfer.getToAccount().getUser().getRole()))){
 			logger.info("To account user is not an external user");
 			return null;
 		}

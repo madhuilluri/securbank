@@ -59,14 +59,14 @@ public class LoginAttempt {
 	/**
 	 * @return the user
 	 */
-	public User getuser() {
+	public User getUser() {
 		return user;
 	}
 
 	/**
 	 * @param account the account to set
 	 */
-	public void setuser(User user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 	

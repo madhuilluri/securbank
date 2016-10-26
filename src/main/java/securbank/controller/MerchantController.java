@@ -44,7 +44,7 @@ import securbank.validators.NewUserFormValidator;
  *
  */
 @Controller
-public class ExternalUserController {
+public class MerchantController {
 	@Autowired
 	UserService userService;
 	
@@ -81,9 +81,9 @@ public class ExternalUserController {
 	@Autowired
 	OtpService otpService;
 	
-	final static Logger logger = LoggerFactory.getLogger(ExternalUserController.class);
+	final static Logger logger = LoggerFactory.getLogger(MerchantController.class);
 
-	@GetMapping("/user/details")
+	@GetMapping("/merchant/details")
     public String currentUserDetails(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
@@ -93,28 +93,28 @@ public class ExternalUserController {
 		model.addAttribute("user", user);
 		logger.info("GET request: External user detail");
 		
-        return "external/detail";
+        return "merchant/detail";
     }
 	
-	@GetMapping("/user/createtransaction")
+	@GetMapping("/merchant/createtransaction")
 	public String newTransactionForm(Model model){
 		model.addAttribute("transaction", new Transaction());
 		logger.info("GET request: Extrernal user transaction creation request");
 		
-		return "external/createtransaction";
+		return "merchant/createtransaction";
 	}
 	
-	@GetMapping("/user/transaction/otp")
+	@GetMapping("/merchant/transaction/otp")
 	public String createTransactionOtp(Model model){
 		model.addAttribute("transaction", new Transaction());
 		logger.info("GET request: Extrernal user transaction generate OTP");
 		User currentUser = userService.getCurrentUser();
 		otpService.createOtpForUser(currentUser);
 		
-		return "redirect:/user/createtransaction";
+		return "redirect:/merchant/createtransaction";
 	}
 	
-	@PostMapping("/user/createtransaction")
+	@PostMapping("/merchant/createtransaction")
     public String submitNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) {
 		logger.info("POST request: Submit transaction");
 		
@@ -122,7 +122,7 @@ public class ExternalUserController {
 
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransaction form with validation errors");
-			return "redirect:/user/createtransaction";
+			return "redirect:/merchant/createtransaction";
 		}
 		
 		if(transaction.getType().contentEquals("CREDIT")){
@@ -139,28 +139,28 @@ public class ExternalUserController {
 		//deactivate current otp
 		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
-		return "redirect:/user/createtransaction";
+		return "redirect:/merchant/createtransaction";
     }
 	
-	@GetMapping("/user/createtransfer")
+	@GetMapping("/merchant/createtransfer")
 	public String newTransferForm(Model model){
 		model.addAttribute("transfer", new Transfer());
 		logger.info("GET request: Extrernal user transfer creation request");
 		
-		return "external/createtransfer";
+		return "merchant/createtransfer";
 	}
 
-	@GetMapping("/user/transfer/otp")
+	@GetMapping("/merchant/transfer/otp")
 	public String createTransferOtp(Model model){
 		model.addAttribute("transfer", new Transfer());
 		logger.info("GET request: Extrernal user transfer generate OTP");
 		User currentUser = userService.getCurrentUser();
 		otpService.createOtpForUser(currentUser);
 		
-		return "redirect:/user/createtransfer";
+		return "redirect:/merchant/createtransfer";
 	}
 	
-	@PostMapping("user/createtransfer")
+	@PostMapping("merchant/createtransfer")
     public String submitNewTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) {
 		logger.info("POST request: Submit transfer");
 		
@@ -168,7 +168,7 @@ public class ExternalUserController {
 		
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransfer form with validation errors");
-			return "redirect:user/createtransfer";
+			return "redirect:merchant/createtransfer";
 		}
 		
 		if(transferService.initiateTransfer(transfer)==null){
@@ -178,10 +178,55 @@ public class ExternalUserController {
 		//deactivate current otp
 		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
-		return "redirect:/user/createtransfer";
+		return "redirect:/merchant/createtransfer";
+	}
+
+	@GetMapping("/merchant/payment")
+	public String newMerchantTransferForm(Model model){
+		model.addAttribute("transfer", new Transfer());
+		logger.info("GET request: Extrernal user transfer creation request");
+		
+		return "merchant/payment";
+	}
+
+	@GetMapping("/merchant/payment/otp")
+	public String createMerchantTransferOtp(Model model){
+		model.addAttribute("transfer", new Transfer());
+		logger.info("GET request: Extrernal user transfer generate OTP");
+		User currentUser = userService.getCurrentUser();
+		otpService.createOtpForUser(currentUser);
+		
+		return "redirect:/merchant/payment";
 	}
 	
-	@GetMapping("/user/edit")
+	@PostMapping("/merchant/payment")
+    public String submitNewMerchantTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) {
+		logger.info("POST request: Submit transfer");
+		
+		merchantPaymentFormValidator.validate(transfer, bindingResult);
+		
+		String otp = otpService.getOtpByUser(userService.getCurrentUser()).getCode();
+		 if(!transfer.getOtp().equals(otp)){
+			logger.info("Otp mismatch");
+			return "redirect:/error?code=400&path=transfer-error";
+		 }
+		
+		if(bindingResult.hasErrors()){
+			logger.info("POST request: createtransfer form with validation errors");
+			return "redirect:/error?code=400&path=transfer-error";
+		}
+		
+		if(transferService.initiateMerchantPaymentRequest(transfer)==null){
+			return "redirect:/error?code=400&path=transfer-error";
+		}
+		
+		//deactivate current otp
+		otpService.deactivateOtpByUser(userService.getCurrentUser());
+		
+		return "redirect:/merchant/payment";
+	}
+	
+	@GetMapping("/merchant/edit")
     public String editUser(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
@@ -189,14 +234,14 @@ public class ExternalUserController {
 		}
 		model.addAttribute("user", user);
 		
-        return "external/edit";
+        return "merchant/edit";
     }
 	
-	@PostMapping("/user/edit")
+	@PostMapping("/merchant/edit")
     public String editSubmit(@ModelAttribute User user, BindingResult bindingResult) {
 		editUserFormValidator.validate(user, bindingResult);
 		if (bindingResult.hasErrors()) {
-			return "external/edit";
+			return "merchant/edit";
         }
 		
 		// create request
@@ -206,7 +251,7 @@ public class ExternalUserController {
     }
 	
 
-	@GetMapping("/user/transfers")
+	@GetMapping("/merchant/transfers")
     public String getTransfers(Model model) {
 		logger.info("GET request:  All pending transfers");
 		
@@ -216,10 +261,10 @@ public class ExternalUserController {
 		}
 		model.addAttribute("transfers", transfers);
 		
-        return "external/pendingtransfers";
+        return "merchant/pendingtransfers";
     }
 	
-	@PostMapping("/user/transfer/request/{id}")
+	@PostMapping("/merchant/transfer/request/{id}")
     public String approveRejectTransfer(@ModelAttribute Transfer trans, @PathVariable() UUID id, BindingResult bindingResult) {
 		
 		Transfer transfer = transferService.getTransferById(id);
@@ -252,10 +297,10 @@ public class ExternalUserController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "redirect:/user/transfers";
+        return "redirect:/merchant/transfers";
     }
 	
-	@GetMapping("/user/transfer/{id}")
+	@GetMapping("/merchant/transfer/{id}")
     public String getTransferRequest(Model model, @PathVariable() UUID id) {
 		Transfer transfer = transferService.getTransferById(id);
 		
@@ -279,10 +324,10 @@ public class ExternalUserController {
 		model.addAttribute("transfer", transfer);
 		logger.info("GET request: User merchant transfer request by ID");
 		
-        return "external/approverequests";
+        return "merchant/approverequests";
 	}
 
-	@GetMapping("/user/request")
+	@GetMapping("/merchant/request")
     public String getRequest(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
@@ -291,10 +336,10 @@ public class ExternalUserController {
 		
 		model.addAttribute("viewrequests", viewAuthorizationService.getPendingAuthorization(user));
 		
-        return "external/accessrequests";
+        return "merchant/accessrequests";
     }
 	
-	@GetMapping("/user/request/view/{id}")
+	@GetMapping("/merchant/request/view/{id}")
     public String getRequest(@PathVariable UUID id, Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
@@ -311,10 +356,10 @@ public class ExternalUserController {
 		
 		model.addAttribute("viewrequest", authorization);
 		
-        return "external/accessrequest_detail";
+        return "merchant/accessrequest_detail";
     }
 	
-	@PostMapping("/user/request/{id}")
+	@PostMapping("/merchant/request/{id}")
     public String getRequests(@PathVariable UUID id, @ModelAttribute ViewAuthorization request, BindingResult bindingResult) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
@@ -336,7 +381,7 @@ public class ExternalUserController {
 		authorization.setStatus(status);
 		authorization = viewAuthorizationService.approveAuthorization(authorization);
 		
-        return "redirect:/user/request";
+        return "redirect:/merchant/request";
     }
 
 }
