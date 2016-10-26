@@ -109,7 +109,12 @@ public class UserServiceImpl implements UserService {
 		logger.info("Creating new internal user");
 		
 		// creates new user
-		user.setType("internal");
+		if (user.getRole().equalsIgnoreCase("ROLE_ADMIN")) {
+			user.setType("admin");
+		}
+		else {
+			user.setType("internal");	
+		}
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(true);
