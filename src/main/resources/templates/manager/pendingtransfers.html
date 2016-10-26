@@ -49,10 +49,15 @@
 			<li><a th:href="@{/manager/user}">View External User Accounts</a></li>
 			<li><a th:href="@{/manager/details}">My Profile</a></li>
 			<li><a th:href="@{/manager/user/request}">New External User Requests</a></li>
+			<li><a th:href="@{/manager/employee/authorize}">Authorize Access</a></li>
+			<li><a th:href="@{/manager/employee/request}">View Access Requests</a></li>
       <li class="active"><a href="#">Pending Transfers</a></li>
 			<li><a th:href="@{/manager/transactions}">Pending Transactions</a></li>
 		</ul>
 	</div>
+
+<div class="alert alert-success" th:if="${param.successAction}">Successfuly approved/rejected transfer</div>
+
 	<div class="container">
 		<div class="input-group">
 			<span class="input-group-addon">Filter</span> <input id="filter"

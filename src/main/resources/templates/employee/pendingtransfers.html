@@ -46,12 +46,17 @@
 	<div class="container">
 		<h3>Employee Dashboard</h3>
 		<ul class="nav nav-tabs nav-justified">
+			<li><a th:href="@{/employee/user}">View External User Accounts</a></li>
 			<li><a th:href="@{/employee/details}">My Profile</a></li>
+			<li><a th:href="@{/employee/user/requestaccess}">Request Access</a></li>
 			<li><a th:href="@{/employee/user/request}">New External User Requests</a></li>
       <li class="active"><a href="#">Pending Transfers</a></li>
 			<li><a th:href="@{/employee/transactions}">Pending Transactions</a></li>
 		</ul>
 	</div>
+
+<div class="alert alert-success" th:if="${param.successAction}">Successfuly approved/rejected transfer</div>
+
 	<div class="container">
 		<div class="input-group">
 			<span class="input-group-addon">Filter</span> <input id="filter"

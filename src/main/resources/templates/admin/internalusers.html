@@ -55,6 +55,10 @@
 			<li><a th:href="@{/admin/syslogs}">System Logs</a></li>
 		</ul>
 	</div>
+
+<div class="alert alert-success" th:if="${param.successEdit}">Successfuly edited internal user profile</div>
+<div class="alert alert-success" th:if="${param.successDelete}">Successfuly deleted internal user profile</div>
+
 	<div class="container">
 		<div class="input-group">
 			<span class="input-group-addon">Filter</span> <input id="filter"

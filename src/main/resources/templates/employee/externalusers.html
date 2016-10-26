@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>Employee Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+<script>
+  $(document).ready(function () {
+
+    (function ($) {
+
+      $('#filter').keyup(function () {
+
+        var rex = new RegExp($(this).val(), 'i');
+        $('.searchable tr').hide();
+        $('.searchable tr').filter(function () {
+          return rex.test($(this).text());
+        }).show();
+
+      })
+
+    }(jQuery));
+
+  });
+  </script>
+</head>
+<body>
+
+	<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<p class="navbar-brand">Cardinals Banking</p>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+					<li><a th:href="@{/manager/details}">My Dashboard</a></li>
+					<li><a th:href="@{/logout}">Logout</a></li>
+				</ul>
+		</div>
+	</nav>
+
+	<div class="container">
+		<h3>Employee Dashboard</h3>
+		<ul class="nav nav-tabs nav-justified">
+			<li class="active"><a href="#">View External User Accounts</a></li>
+			<li><a th:href="@{/employee/details}">My Profile</a></li>
+			<li><a th:href="@{/employee/user/requestaccess}">Request Access</a></li>
+			<li><a th:href="@{/employee/user/request}">New External User Requests</a></li>
+			<li><a th:href="@{/employee/transfers}">Pending Transfers</a></li>
+			<li><a th:href="@{/employee/transactions}">Pending Transactions</a></li>
+		</ul>
+	</div>
+
+	<div class="alert alert-success" th:if="${param.successEdit}">Successfuly edited external user profile</div>
+	<div class="alert alert-success" th:if="${param.successDelete}">Successfuly deleted external user profile</div>
+
+	<div class="container">
+		<div class="input-group">
+			<span class="input-group-addon">Filter</span> <input id="filter"
+				type="text" class="form-control" placeholder="Type here..." />
+		</div>
+		<div class="container">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Username</th>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>Email</th>
+						<th>Role</th>
+					</tr>
+				</thead>
+				<tbody class="searchable">
+					<tr th:each="user : ${users}">
+						<td th:text="${user.username}"></td>
+						<td th:text="${user.firstName}"></td>
+						<td th:text="${user.lastName}"></td>
+						<td th:text="${user.email}"></td>
+						<td th:text="${user.role}"></td>
+						<td><a th:href="@{/employee/user/{id}(id=${user.userId})}">View</a></td>
+						<td><a th:href="@{/employee/user/edit/{id}(id=${user.userId})}">Edit</a></td>
+						<td><a th:href="@{/employee/user/delete/{id}(id=${user.userId})}">Delete</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>

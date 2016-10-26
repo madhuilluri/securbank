@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>User Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
+</head>
+<body>
+	<div class="container">
+		<h3 th:text="${user.firstName+' '+user.lastName+'s Profile'}"></h3>
+	</div>
+
+	<div class="container">
+		<form action="#"
+		th:action="@{/employee/user/delete/{id}(id=${user.userId})}" th:object="${user}" method="post">
+			<table class="table table-user-information">
+				<tbody>
+					<tr>
+						<td>Username</td>
+						<td th:text="${user.username}"></td>
+					</tr>
+					<tr>
+						<td>Full Name</td>
+						<td th:text="${user.firstName}+' '+${user.lastName}"></td>
+					</tr>
+					<tr>
+						<td>Email</td>
+						<td th:text="${user.email}"></td>
+					</tr>
+					<tr>
+						<td>Address Line 1</td>
+						<td th:text="${user.addressLine1}"></td>
+					</tr>
+					<tr>
+						<td>Address Line 2</td>
+						<td th:text="${user.addressLine2}"></td>
+					</tr>
+					<tr>
+						<td>City</td>
+						<td th:text="${user.city}"></td>
+					</tr>
+					<tr>
+						<td>State</td>
+						<td th:text="${user.state}"></td>
+					</tr>
+					<tr>
+						<td>Zip Code</td>
+						<td th:text="${user.zip}"></td>
+					</tr>
+					<tr>
+						<td>Role</td>
+						<td th:text="${user.role}"></td>
+					</tr>
+				</tbody>
+			</table>
+			<button id="deletbutton" name="deletebutton" type="submit"
+				class="btn btn-danger">Delete</button>
+		</form>
+	</div>
+
+</body>
+</html>

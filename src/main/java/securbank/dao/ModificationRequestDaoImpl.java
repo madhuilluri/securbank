@@ -85,4 +85,21 @@ public class ModificationRequestDaoImpl extends BaseDaoImpl<ModificationRequest,
 				.setParameter("user", user)							
 				.getResultList();
 	}
+
+	/* (non-Javadoc)
+	 * @see securbank.dao.ModificationRequestDao#findAllbyStatusAndUserTypeAndUsers(java.lang.String, java.lang.String, java.util.List)
+	 */
+	@Override
+	public List<ModificationRequest> findAllbyStatusAndUserTypeAndUsers(String status, String userType,
+			List<User> users) {
+		return this.entityManager.createQuery("SELECT request from ModificationRequest request " +
+									"WHERE request.status = :status " +
+									"AND userType = :type " +
+									"AND request.active = TRUE " +
+									"AND request.user IN :users", ModificationRequest.class)
+				.setParameter("status", status)							
+				.setParameter("type", userType)
+				.setParameter("users", users)
+				.getResultList();
+	}
 }

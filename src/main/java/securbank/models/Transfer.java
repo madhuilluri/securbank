@@ -11,12 +11,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.joda.time.LocalDateTime;
@@ -83,14 +82,20 @@ public class Transfer {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "transfer")
 	private Set<Transaction> transactions = new HashSet<Transaction>(0);
 
+	@Transient
+	@Column(name = "otp")
+	private String otp;
+	
 	public Transfer(){
 		
 	}
 
+	
+	
 	/**
 	 * @param transferId
-	 * @param fromAccountNumber
-	 * @param toAccountNumber
+	 * @param fromAccount
+	 * @param toAccount
 	 * @param amount
 	 * @param status
 	 * @param createdOn
@@ -98,13 +103,14 @@ public class Transfer {
 	 * @param modifiedBy
 	 * @param active
 	 * @param transactions
+	 * @param otp
 	 */
-	public Transfer(UUID transferId, Account fromAccount, Account toAccountNumber, double amount, String status,
+	public Transfer(UUID transferId, Account fromAccount, Account toAccount, double amount, String status,
 			LocalDateTime createdOn, LocalDateTime modifiedOn, User modifiedBy, Boolean active,
-			Set<Transaction> transactions) {
+			Set<Transaction> transactions, String otp) {
 		this.transferId = transferId;
 		this.fromAccount = fromAccount;
-		this.toAccount = toAccountNumber;
+		this.toAccount = toAccount;
 		this.amount = amount;
 		this.status = status;
 		this.createdOn = createdOn;
@@ -112,6 +118,7 @@ public class Transfer {
 		this.modifiedBy = modifiedBy;
 		this.active = active;
 		this.transactions = transactions;
+		this.otp = otp;
 	}
 
 
@@ -257,17 +264,30 @@ public class Transfer {
 		this.transactions = transactions;
 	}
 
+	/**
+	 * @return the otp
+	 */
+	public String getOtp() {
+		return otp;
+	}
+
+	/**
+	 * @param otp the otp to set
+	 */
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Transfer [transferId=" + transferId + ", fromAccount=" + fromAccount + ", toAccount="
-				+ toAccount + ", amount=" + amount + ", status=" + status + ", createdOn=" + createdOn
-				+ ", modifiedOn=" + modifiedOn + ", modifiedBy=" + modifiedBy + ", active=" + active + ", transactions="
-				+ transactions + "]";
+		return "Transfer [transferId=" + transferId + ", fromAccount=" + fromAccount + ", toAccount=" + toAccount
+				+ ", amount=" + amount + ", status=" + status + ", createdOn=" + createdOn + ", modifiedOn="
+				+ modifiedOn + ", modifiedBy=" + modifiedBy + ", active=" + active + ", transactions=" + transactions
+				+ ", otp=" + otp + "]";
 	}
-
 	
 }
 	

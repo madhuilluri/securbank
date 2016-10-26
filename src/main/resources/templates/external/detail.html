@@ -28,8 +28,12 @@
 		<ul class="nav nav-tabs nav-justified">
 			<li class="active"><a href="#">My Profile</a></li>
 			<li><a th:href="@{/user/createtransaction}">Transactions</a></li>
+			<li><a th:href="@{/user/transfers}">Pending Transfer Requests</a></li>
+			<li><a th:href="@{/user/request}">View Access Requests</a></li>
 		</ul>
 	</div>
+
+	<div class="alert alert-success" th:if="${param.successEdit}">Successfuly edited profile</div>
 
 	<div class="container">
 		<h4 th:text="${user.firstName+' '+user.lastName+'s Profile'}"></h4>

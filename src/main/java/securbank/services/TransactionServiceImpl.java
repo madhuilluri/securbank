@@ -1,12 +1,10 @@
 package securbank.services;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import securbank.models.Account;
-import securbank.models.Transaction;
 import javax.transaction.Transactional;
+
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +14,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import securbank.dao.AccountDao;
-import securbank.dao.AccountDaoImpl;
 import securbank.dao.TransactionDao;
 import securbank.dao.TransferDao;
+import securbank.models.Account;
+import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
 
@@ -40,9 +39,6 @@ public class TransactionServiceImpl implements TransactionService{
 	@Autowired
 	private AccountDao accountDao;
 	
-	@Autowired 
-	private AccountService accountService;
-	
 	@Autowired
 	private UserService userService;
 	
@@ -51,6 +47,9 @@ public class TransactionServiceImpl implements TransactionService{
 	
 	@Autowired
 	private Environment env;
+	
+	@Autowired
+	OtpService otpService;
 	
 	private SimpleMailMessage message;
 	
@@ -132,11 +131,13 @@ public class TransactionServiceImpl implements TransactionService{
 				transaction.setAccount(acc);
 			}
 		}
+		
+		
 		transaction.setApprovalStatus("Pending");
 		if (transaction.getAmount() > Double.parseDouble(env.getProperty("critical.amount"))) {
 			transaction.setCriticalStatus(true);
 		}
-
+		
 		transaction.setType("CREDIT");
 		transaction.setCreatedOn(LocalDateTime.now());
 		transaction.setActive(true);
@@ -234,6 +235,7 @@ public class TransactionServiceImpl implements TransactionService{
 		transactionTo.setActive(true);
 		transactionTo.setApprovalStatus("Pending");
 		transactionTo.setType("CREDIT");
+		transactionTo.setTransfer(transfer);
 		transactionTo = initiateCredit(transactionTo);
 		approveTransactionFromTransfer(transactionTo);
 		
@@ -243,6 +245,7 @@ public class TransactionServiceImpl implements TransactionService{
 		transactionFrom.setActive(true);
 		transactionFrom.setApprovalStatus("Pending");
 		transactionFrom.setType("DEBIT");
+		transactionFrom.setTransfer(transfer);
 		transactionFrom = initiateDebit(transactionFrom);
 		approveTransactionFromTransfer(transactionFrom);
 		

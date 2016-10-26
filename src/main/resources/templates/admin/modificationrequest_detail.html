@@ -51,7 +51,7 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 						<label class="col-md-4 control-label" for="textinput">E-mail</label>
 						<div class="col-md-4">
 							<input id="textinput" name="textinput" type="text" placeholder=""
-							class="form-control input-md" th:field="*{email}" />
+							class="form-control input-md" th:field="*{email}" readonly="true"/>
 							<div class="alert alert-danger"
 							th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
 						</div>

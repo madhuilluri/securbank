@@ -53,6 +53,9 @@ public class TransferServiceImpl implements TransferService{
 	private EmailService emailService;
 	
 	@Autowired
+	OtpService otpService;
+	
+	@Autowired
 	private Environment env;
 	
 	private SimpleMailMessage message;
@@ -90,6 +93,12 @@ public class TransferServiceImpl implements TransferService{
 			}
 		}
 		
+		//check otp
+		if(!transfer.getOtp().equals(otpService.getOtpByUser(transfer.getFromAccount().getUser()).getCode())){
+			logger.info("Otp mismatch");
+			return null;
+		}
+		
 		if(isTransferValid(transfer)==false){
 			return null;
 		}
@@ -109,12 +118,12 @@ public class TransferServiceImpl implements TransferService{
 		}
 		
 		//user types should be external
-		if(!"ROLE_INDIVIDUAL".equalsIgnoreCase(currentUser.getRole()) && !"ROLE_MERCHANT".equalsIgnoreCase(currentUser.getEmail())){
+		if((!"ROLE_INDIVIDUAL".equalsIgnoreCase(currentUser.getRole())) && (!"ROLE_MERCHANT".equalsIgnoreCase(currentUser.getRole()))){
 			logger.info("Current user is not an external user");
 			return null;
 		}
 		
-		if(!"ROLE_INDIVIDUAL".equalsIgnoreCase(transfer.getToAccount().getUser().getRole()) && !"ROLE_MERCHANT".equalsIgnoreCase(transfer.getToAccount().getUser().getRole())){
+		if((!"ROLE_INDIVIDUAL".equalsIgnoreCase(transfer.getToAccount().getUser().getRole())) && (!"ROLE_MERCHANT".equalsIgnoreCase(transfer.getToAccount().getUser().getRole()))){
 			logger.info("To account user is not an external user");
 			return null;
 		}
@@ -247,7 +256,24 @@ public class TransferServiceImpl implements TransferService{
 		}
 		return transferDao.findByApprovalStatus(approvalStatus);
 	}
-
+	
+	/**
+     * Fetches all pending transfers by approval status
+     * 
+     * @param approvalStatus
+     *            The list of pending transfers
+     * @return list of transfer
+     * */
+	@Override
+	public List<Transfer> getTransfersByStatusAndUser(User user, String approvalStatus) {
+		logger.info("Get waiting transfers by approval status");
+		if(approvalStatus==null){
+			return null;
+		}
+		return transferDao.findByUserAndApprovalStatus(user, approvalStatus);
+	}
+	
+	
 	/**
      * Fetches transfer by transactionId
      * 
@@ -308,6 +334,101 @@ public class TransferServiceImpl implements TransferService{
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Transfer initiateMerchantPaymentRequest(Transfer transfer) {
+		logger.info("Initiating new payment request");
+		
+		User currentUser = userService.getCurrentUser();
+		if(currentUser==null){
+			logger.info("Current logged in user is null");
+			return null;
+		}
+		
+		//accountTo and accountFrom should not have same email address
+		if(currentUser.getEmail().equalsIgnoreCase(transfer.getFromAccount().getUser().getEmail())){
+			logger.info("Transfer to and from accounts are same");
+			return null;
+		}
+		
+		//get user's checking account
+		logger.info("Getting current user's checking account");
+		for (Account acc: currentUser.getAccounts()){
+			if (acc.getType().equalsIgnoreCase("checking")){
+				transfer.setToAccount(acc);
+			}
+		}
+		
+		//check otp
+		if(!transfer.getOtp().equals(otpService.getOtpByUser(transfer.getToAccount().getUser()).getCode())){
+			logger.info("Otp mismatch");
+			return null;
+		}
+		
+		//get user's checking account
+		logger.info("Getting fromAccount user's checking account");
+		User fromUser = userService.getUserByEmail(transfer.getFromAccount().getUser().getEmail());
+		for (Account acc: fromUser.getAccounts()){
+			if (acc.getType().equalsIgnoreCase("checking")){
+				transfer.setFromAccount(acc);
+			}
+		}
+		
+		if(isTransferValid(transfer)==false){
+			return null;
+		}
+		
+		//check if account exists and is active
+		if(isToAccountValid(transfer)==false){
+			return null;
+		}
+		
+		//user types should be external
+		if(!"ROLE_MERCHANT".equalsIgnoreCase(currentUser.getRole())){
+			logger.info("Current user is not a merchant");
+			return null;
+		}
+		
+		if(!"ROLE_INDIVIDUAL".equalsIgnoreCase(transfer.getFromAccount().getUser().getRole())){
+			logger.info("From account user is not an external user");
+			return null;
+		}
+
+		transfer.setStatus("Waiting");
+		transfer.setActive(true);
+		transfer.setCreatedOn(LocalDateTime.now());
+		
+		transferDao.save(transfer);
+		logger.info("After transferDao save");
+		
+		//send email to sender
+		User user = transfer.getFromAccount().getUser();
+		message = new SimpleMailMessage();
+		message.setText(env.getProperty("external.user.transfer.to.body"));
+		message.setSubject(env.getProperty("external.user.transfer.subject"));
+		message.setTo(user.getEmail());
+		emailService.sendEmail(message);
+		
+		//send email to sender
+		user = transfer.getToAccount().getUser();
+		message = new SimpleMailMessage();
+		message.setText(env.getProperty("external.user.transfer.from.body"));
+		message.setSubject(env.getProperty("external.user.transfer.subject"));
+		message.setTo(user.getEmail());
+		emailService.sendEmail(message);
+		
+		return transfer;
+	}
+
+	@Override
+	public Transfer approveTransferToPending(Transfer transfer) {
+		transfer.setStatus("Pending");
+		transfer.setModifiedBy(userService.getCurrentUser());
+		transfer.setModifiedOn(LocalDateTime.now());
+		transferDao.update(transfer);
+		
+		return transfer;
 	}
 
 }

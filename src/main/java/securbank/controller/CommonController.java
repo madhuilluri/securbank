@@ -2,10 +2,9 @@ package securbank.controller;
 
 import java.util.UUID;
 
-import javax.servlet.http.HttpSession;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +22,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import securbank.dao.UserDao;
+import securbank.models.ChangePasswordRequest;
 import securbank.models.CreatePasswordRequest;
 import securbank.models.ForgotPasswordRequest;
-import securbank.models.ChangePasswordRequest;
 import securbank.models.User;
-import securbank.dao.UserDao;
-import securbank.services.ForgotPasswordService;
+import securbank.models.Verification;
 import securbank.services.AuthenticationService;
+import securbank.services.ForgotPasswordService;
 import securbank.services.SecurityContextService;
 import securbank.services.UserService;
-
-import securbank.validators.CreatePasswordFormValidator;
+import securbank.services.VerificationService;
 import securbank.validators.ChangePasswordFormValidator;
-
+import securbank.validators.CreatePasswordFormValidator;
 import securbank.validators.NewUserFormValidator;
 
 /**
@@ -62,6 +61,9 @@ public class CommonController {
 	
 	@Autowired
 	CreatePasswordFormValidator createPasswordFormValidator; 
+	
+	@Autowired
+	VerificationService verificationService;
 	
 	@Autowired
     public HttpSession session;
@@ -124,7 +126,7 @@ public class CommonController {
 		return "redirect:/";
 	}
 
-	@GetMapping("/user/verify/{id}")
+	@GetMapping("/verify/{id}")
 	public String verifyNewUser(Model model, @PathVariable UUID id) {
 		if (userService.verifyNewUser(id) == false) {
 			logger.info("GET request: verification failed of new external user");
@@ -135,43 +137,47 @@ public class CommonController {
 		return "redirect:/";
     }
 	
+
 	// for forgot password
 	@GetMapping("/forgotpassword")
 	public String forgotpasswordform(Model model){
 		model.addAttribute("forgotPasswordRequest", new ForgotPasswordRequest());
 		logger.info("GET request : email address for forgot password");
+		
 		return "forgotpassword";
 	}
 	
 	@PostMapping("/forgotpassword")
 	public String forgotpasswordsubmit(@ModelAttribute ForgotPasswordRequest forgotPasswordRequest){
-		
 		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getUserName());
-		if(user==null){
+		if(user == null) {
 			logger.info("POST request: Forgot password with invalid user id");
+			
 			return "redirect:/error?code=400&path=bad-request";
 		}
 		
-		if(!forgotPasswordService.verifyUserAndInfo(user, forgotPasswordRequest)){
+		if(!forgotPasswordService.verifyUserAndInfo(user, forgotPasswordRequest)) {
 			logger.info("GET request : user and entered deails did not match");
+			
 			return "redirect:/error?code=400&path-bad-request";
 		}
-			
-		forgotPasswordService.sendEmailForgotPassword(user);			
+		Verification verification = verificationService.createVerificationCodeByType(user, "forgot");	
+		forgotPasswordService.sendEmailForgotPassword(verification);			
 		logger.info("POST request : Sending link to reset password");
 		
-		return "redirect:/";
+		return "redirect:/login";
 	}
 	
 	@GetMapping("/createpassword/{id}")
 	public String createpasswordform(Model model, @PathVariable UUID id){
-		User user = userService.getUserByIdAndActive(id);
+		User user = verificationService.getUserByIdAndType(id, "forgot");
 		if(user == null){
+		
 			logger.info("GET request : verification failed for user's registered email ");
 			return "redirect:/error?code=user.notfound";
 		}
-		
-		model.addAttribute("createpasswordrequest", new CreatePasswordRequest());
+		session.setAttribute("forgotpassword.verification", id);
+		model.addAttribute("createPasswordRequest", new CreatePasswordRequest());
 		logger.info("GET request : Create new password");
 		return "createpassword";
 	}
@@ -179,22 +185,24 @@ public class CommonController {
 	
 	@PostMapping("/createpassword")
     public String createPasswordSubmit(@ModelAttribute CreatePasswordRequest request, BindingResult binding) {
-		UUID token = (UUID) session.getAttribute("verification.token");
+		UUID token = (UUID) session.getAttribute("forgotpassword.verification");
 		if (token == null) {
 			logger.info("POST request: Email for forgot password with invalid session token");
 			return "redirect:/error?code=400&path=bad-request";
 		}
-		else {
-			// clears session
-			session.removeAttribute("validation.token");
-		}
+
+		// clears session
+		User user = verificationService.getUserByIdAndType(token, "forgot");
+		session.removeAttribute("forgotpassword.verification");
 		
-		User user = userService.getUserByIdAndActive(token);
+		// User user = userService.getUserByIdAndActive(token);
+		
 		if(user==null){
 			logger.info("POST request: Forgot password with invalid user id");
 			return "redirect:/error?code=400&path=bad-request";
 		}
-		
+			
+		verificationService.removeVerification(token);
 		if(!user.getEmail().equals(request.getEmail()) || !user.getPhone().equals(request.getPhone()) ){
 			logger.info("GET request : Creating new password with invalid credentials ");
 			return "redirect:/error?code=400&path=bad-request";			
@@ -213,7 +221,6 @@ public class CommonController {
 
     }
 	
-
 	@GetMapping("/request/verify/{id}")
 	public String verifyEmailRequest(Model model, @PathVariable UUID id) {
 		if (userService.verifyModificationRequest("waiting", id) == false) {
@@ -252,9 +259,59 @@ public class CommonController {
 		}
 
 		return "redirect:/error?code=500";
-
 	}
+	
+	@GetMapping("/reactivate/{id}")
+	public String reactivateUser(Model model, @PathVariable UUID id){
+		User user = verificationService.getUserByIdAndType(id, "lock");
+		if (user == null) {
+			logger.info("GET request: acoount reactivation failed");
+			
+			return "redirect:/error?code=400";
+		}
+		session.setAttribute("reactivate.verification", id);
+		model.addAttribute("createPasswordRequest", new CreatePasswordRequest());
+		logger.info("GET request : reactivate account");
+		return "reactivate";
+	}
+	
+	
+	@PostMapping("/reactivate")
+    public String reactivateSubmit(@ModelAttribute CreatePasswordRequest request, BindingResult binding) {
+		UUID token = (UUID) session.getAttribute("reactivate.verification");
+		if (token == null) {
+			logger.info("POST request: Email for forgot password with invalid session token");
+			return "redirect:/error?code=400&path=bad-request";
+		}
 
+		// clears session
+		User user = verificationService.getUserByIdAndType(token, "lock");
+		session.removeAttribute("reactivation.verification");
+		
+		// User user = userService.getUserByIdAndActive(token);
+		if(user==null){
+			logger.info("POST request: Forgot password with invalid user id");
+			
+			return "redirect:/error?code=400&path=bad-request";
+		}
+		verificationService.removeVerification(token);
+		if(!user.getEmail().equals(request.getEmail()) || !user.getPhone().equals(request.getPhone()) ){
+			logger.info("GET request : Creating new password with invalid credentials ");
+			return "redirect:/error?code=400&path=bad-request";			
+		}
+		
+		createPasswordFormValidator.validate(request, binding);
+			if(binding.hasErrors()){
+				logger.info("POST request: createpassword form with validation errors");
+				return "reactivate";
+			}
+		userService.verifyNewUser(user.getUserId());
+		if(forgotPasswordService.createUserPassword(user, request) != null){
+			return "redirect:/login";
+		}
+		
+		return "redirect:/error?code=500";
+    }
 
 }
 

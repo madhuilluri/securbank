@@ -29,10 +29,14 @@
 			<li><a th:href="@{/manager/user}">View External User Accounts</a></li>
 			<li class="active"><a href="#">My Profile</a></li>
 			<li><a th:href="@{/manager/user/request}">New External User Requests</a></li>
+			<li><a th:href="@{/manager/employee/authorize}">Authorize Access</a></li>
+			<li><a th:href="@{/manager/employee/request}">View Access Requests</a></li>
 			<li><a th:href="@{/manager/transfers}">Pending Transfers</a></li>
 			<li><a th:href="@{/manager/transactions}">Pending Transactions</a></li>
 		</ul>
 	</div>
+
+	<div class="alert alert-success" th:if="${param.successEdit}">Successfuly edited profile</div>
 
 	<div class="container">
 		<h4 th:text="${user.firstName+' '+user.lastName+'s Profile'}"></h4>

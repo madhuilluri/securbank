@@ -19,6 +19,7 @@ import securbank.services.AuthenticationService;
  * @author Ayush Gupta
  *
  */
+
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Autowired
@@ -31,10 +32,13 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		User user = auth.verifyUser(authentication.getPrincipal().toString(), authentication.getCredentials().toString());
+		
 		if (user == null) {
-			 throw new BadCredentialsException("Username or password is incorrect");
+			throw new BadCredentialsException("Invalid Username or Password.");
 		}
+		
 		auth.updateLoginTime(user);
+		
 		
 		List<GrantedAuthority> roles = AuthorityUtils.commaSeparatedStringToAuthorityList(user.getRole());
 		
