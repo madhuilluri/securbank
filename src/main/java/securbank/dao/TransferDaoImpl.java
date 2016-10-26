@@ -121,4 +121,19 @@ public class TransferDaoImpl extends BaseDaoImpl<Transfer, UUID> implements Tran
 			return null;
 		}
 	}
+
+	@Override
+	public List<Transfer> findNonCriticalByApprovalStatus(String approvalStatus) {
+		try {
+			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
+					+ " where transfer.status = :status AND transfer.criticalStatus = :critical", Transfer.class)
+					.setParameter("status", approvalStatus)
+					.setParameter("critical", false)
+					.getResultList();
+		}
+		catch(NoResultException e) {
+			// returns null if no transfer is found
+			return null;
+		}
+	}
 }

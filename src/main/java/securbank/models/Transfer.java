@@ -82,6 +82,10 @@ public class Transfer {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "transfer")
 	private Set<Transaction> transactions = new HashSet<Transaction>(0);
 
+	@NotNull
+	@Column(name = "criticalStatus", unique = false, nullable = false, columnDefinition = "BIT")
+	private boolean criticalStatus;
+	
 	@Transient
 	@Column(name = "otp")
 	private String otp;
@@ -90,8 +94,6 @@ public class Transfer {
 		
 	}
 
-	
-	
 	/**
 	 * @param transferId
 	 * @param fromAccount
@@ -103,11 +105,12 @@ public class Transfer {
 	 * @param modifiedBy
 	 * @param active
 	 * @param transactions
+	 * @param criticalStatus
 	 * @param otp
 	 */
 	public Transfer(UUID transferId, Account fromAccount, Account toAccount, double amount, String status,
 			LocalDateTime createdOn, LocalDateTime modifiedOn, User modifiedBy, Boolean active,
-			Set<Transaction> transactions, String otp) {
+			Set<Transaction> transactions, boolean criticalStatus, String otp) {
 		this.transferId = transferId;
 		this.fromAccount = fromAccount;
 		this.toAccount = toAccount;
@@ -118,10 +121,9 @@ public class Transfer {
 		this.modifiedBy = modifiedBy;
 		this.active = active;
 		this.transactions = transactions;
+		this.criticalStatus = criticalStatus;
 		this.otp = otp;
 	}
-
-
 
 	/**
 	 * @return the transferId
@@ -138,7 +140,7 @@ public class Transfer {
 	}
 
 	/**
-	 * @return the toAccountNumber
+	 * @return the toAccount
 	 */
 	public Account getToAccount() {
 		return toAccount;
@@ -194,6 +196,20 @@ public class Transfer {
 	}
 
 	/**
+	 * @return the criticalStatus
+	 */
+	public boolean isCriticalStatus() {
+		return criticalStatus;
+	}
+
+	/**
+	 * @return the otp
+	 */
+	public String getOtp() {
+		return otp;
+	}
+
+	/**
 	 * @param transferId the transferId to set
 	 */
 	public void setTransferId(UUID transferId) {
@@ -201,15 +217,14 @@ public class Transfer {
 	}
 
 	/**
-	 * @param fromAccount
-	 *  the fromAccount to set
+	 * @param fromAccount the fromAccount to set
 	 */
 	public void setFromAccount(Account fromAccount) {
 		this.fromAccount = fromAccount;
 	}
 
 	/**
-	 * @param toAccountNumber the toAccountNumber to set
+	 * @param toAccount the toAccount to set
 	 */
 	public void setToAccount(Account toAccount) {
 		this.toAccount = toAccount;
@@ -265,10 +280,10 @@ public class Transfer {
 	}
 
 	/**
-	 * @return the otp
+	 * @param criticalStatus the criticalStatus to set
 	 */
-	public String getOtp() {
-		return otp;
+	public void setCriticalStatus(boolean criticalStatus) {
+		this.criticalStatus = criticalStatus;
 	}
 
 	/**
@@ -286,8 +301,9 @@ public class Transfer {
 		return "Transfer [transferId=" + transferId + ", fromAccount=" + fromAccount + ", toAccount=" + toAccount
 				+ ", amount=" + amount + ", status=" + status + ", createdOn=" + createdOn + ", modifiedOn="
 				+ modifiedOn + ", modifiedBy=" + modifiedBy + ", active=" + active + ", transactions=" + transactions
-				+ ", otp=" + otp + "]";
+				+ ", criticalStatus=" + criticalStatus + ", otp=" + otp + "]";
 	}
+
 	
 }
 	

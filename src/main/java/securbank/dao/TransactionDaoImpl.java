@@ -198,4 +198,19 @@ public class TransactionDaoImpl extends BaseDaoImpl<Transaction, UUID> implement
 			return null;
 		}
 	}
+
+	@Override
+	public List<Transaction> findNonCriticalByApprovalStatus(String status) {
+		try {
+			return this.entityManager.createQuery("SELECT transaction from Transaction transaction"
+					+ " where transaction.approvalStatus = :approvalStatus AND transaction.criticalStatus = :criticalStatus", Transaction.class)
+					.setParameter("approvalStatus", status)
+					.setParameter("criticalStatus", false)
+					.getResultList();
+		}
+		catch(NoResultException e) {
+			// returns null if no transaction is found
+			return null;
+		}
+	}
 }

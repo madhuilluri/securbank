@@ -410,6 +410,7 @@ public class ManagerController {
 
 		if("approved".equalsIgnoreCase(trans.getStatus())){
 			//check if transfer is valid in case modified
+			transfer.setAmount(trans.getAmount());
 			if(transferService.isTransferValid(transfer)==false){
 				//return "redirect:/error?code=401&path=amount-invalid";
 				throw new Exceptions("401","Invalid Amount !");

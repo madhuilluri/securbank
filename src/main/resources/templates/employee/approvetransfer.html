@@ -45,7 +45,8 @@
 				</tr>
 				<tr>
 					<td>Amount</td>
-					<td th:text="${transfer.amount}"></td>
+					<td> <input type="text" name="amount" th:field="*{amount}" th:text="${transfer.amount}"/> </td>
+					<!--  <td th:text="${transfer.amount}"></td>-->
 				</tr>
 			</tbody>
 		</table>
