@@ -41,7 +41,6 @@ import securbank.services.VerificationService;
 import securbank.validators.ChangePasswordFormValidator;
 import securbank.validators.CreatePasswordFormValidator;
 import securbank.validators.NewUserFormValidator;
-import securbank.validators.SsnFormValidator;
 
 /**
  * @author Ayush Gupta
@@ -61,9 +60,6 @@ public class CommonController {
 
 	@Autowired
 	NewUserFormValidator userFormValidator;
-	
-	@Autowired
-	SsnFormValidator ssnFormValidator;
 	
 	@Autowired
 	UserDao userDAO;
