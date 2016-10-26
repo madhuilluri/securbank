@@ -39,6 +39,9 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
       <li role="presentation" style="float:none;display:inline-block"><a th:href="@{/user/createtransaction}">Credit/Debit</a></li>
     </ul>
   </div>
+
+  <div class="alert alert-success" th:if="${param.successTransaction}">Successfuly initiated transfer</div>
+  
   <div class="container" style="margin-top:15px;">
     <form class="form-horizontal" action="#" th:action="@{/user/createtransfer}" th:object="${transfer}" method="post">
       <fieldset>

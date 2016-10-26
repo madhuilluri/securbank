@@ -42,6 +42,8 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 		</ul>
 	</div>
 
+	<div class="alert alert-success" th:if="${param.successTransaction}">Successfuly initiated transaction</div>
+
 	<div class="container" style="margin-top:15px;">
 		<form class="form-horizontal" action="#" th:action="@{/merchant/createtransaction}" th:object="${transaction}" method="post">
 			<fieldset>
