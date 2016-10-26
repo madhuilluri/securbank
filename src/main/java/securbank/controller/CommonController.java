@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import securbank.dao.UserDao;
-import securbank.models.ChangePasswordRequest;
 import securbank.models.CreatePasswordRequest;
 import securbank.models.ForgotPasswordRequest;
+import securbank.models.ChangePasswordRequest;
+
+import securbank.dao.UserDao;
+
 import securbank.models.User;
 import securbank.models.Verification;
 import securbank.services.AuthenticationService;
@@ -36,6 +38,7 @@ import securbank.services.VerificationService;
 import securbank.validators.ChangePasswordFormValidator;
 import securbank.validators.CreatePasswordFormValidator;
 import securbank.validators.NewUserFormValidator;
+import securbank.validators.SsnFormValidator;
 
 /**
  * @author Ayush Gupta
@@ -55,6 +58,9 @@ public class CommonController {
 
 	@Autowired
 	NewUserFormValidator userFormValidator;
+	
+	@Autowired
+	SsnFormValidator ssnFormValidator;
 	
 	@Autowired
 	UserDao userDAO;
@@ -111,6 +117,7 @@ public class CommonController {
 
 	@PostMapping("/signup")
 	public String signupSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		
 		userFormValidator.validate(user, bindingResult);
 		if (bindingResult.hasErrors()) {
 			logger.info("POST request: signup form with validation errors");
@@ -149,7 +156,9 @@ public class CommonController {
 	
 	@PostMapping("/forgotpassword")
 	public String forgotpasswordsubmit(@ModelAttribute ForgotPasswordRequest forgotPasswordRequest){
-		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getUserName());
+
+		
+		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getuserName());
 		if(user == null) {
 			logger.info("POST request: Forgot password with invalid user id");
 			
@@ -176,6 +185,8 @@ public class CommonController {
 			logger.info("GET request : verification failed for user's registered email ");
 			return "redirect:/error?code=user.notfound";
 		}
+		
+		model.addAttribute("request", new CreatePasswordRequest());
 		session.setAttribute("forgotpassword.verification", id);
 		model.addAttribute("createPasswordRequest", new CreatePasswordRequest());
 		logger.info("GET request : Create new password");
@@ -312,6 +323,6 @@ public class CommonController {
 		
 		return "redirect:/error?code=500";
     }
-
+	
 }
 

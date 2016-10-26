@@ -34,14 +34,14 @@ public class ForgotPasswordRequest {
 	/**
 	 * @return the userName
 	 */
-	public String getUserName() {
+	public String getuserName() {
 		return userName;
 	}
 
 	/**
 	 * @param userName the userName to set
 	 */
-	public void setUserName(String userName) {
+	public void setuserName(String userName) {
 		this.userName = userName;
 	}
 

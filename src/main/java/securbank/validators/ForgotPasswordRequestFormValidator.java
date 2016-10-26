@@ -51,7 +51,7 @@ public class ForgotPasswordRequestFormValidator implements Validator{
 		}
 		
 		if (!errors.hasFieldErrors("username")) {
-			if (!ContraintUtils.validateUsername(forgotPasswordRequest.getUserName())) {
+			if (!ContraintUtils.validateUsername(forgotPasswordRequest.getuserName())) {
 				errors.rejectValue("username", "forgotPasswordRequest.username.contraint", "Username can contain lowercase alphanumeric with (-,_) and length should be between 3 and 15");
 			}
 		}

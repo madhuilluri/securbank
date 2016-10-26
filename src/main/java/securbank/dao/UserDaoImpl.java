@@ -140,4 +140,25 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
 					.setParameter("phone", phone)
 					.getSingleResult() != 0;
 	}
+	
+	/**
+	 * Returns if ssn exists in table
+	 * 
+	 * @param ssn
+	 * 			The ssn to check
+	 * @return boolean
+	 */
+	@Override
+	public boolean ssnExists(String ssn) {
+		return this.entityManager.createQuery("SELECT COUNT(pii) from Pii pii where (pii.ssn = :ssn)", Long.class)
+				.setParameter("ssn",ssn)
+				.getSingleResult()!=0;
+
+	}
+
+	@Override
+	public List<User> accessPii() {
+		return this.entityManager.createQuery("SELECT username,user.pii.ssn from User user where user.active=true", User.class)
+											.getResultList();
+	}
 }

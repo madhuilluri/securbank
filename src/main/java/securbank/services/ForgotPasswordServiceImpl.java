@@ -67,7 +67,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 	public boolean verifyUserAndInfo(User user, ForgotPasswordRequest request) {
 		logger.info("Verfying if the user deatilas and request details match");
 		
-		if(!(user.getEmail().equals(request.getEmail())) || !(user.getUsername().equals(request.getUserName())) )
+		if(!(user.getEmail().equals(request.getEmail())) || !(user.getUsername().equals(request.getuserName())) )
 			return false;
 		
 		return true;

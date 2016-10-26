@@ -27,6 +27,8 @@ public class ContraintUtils {
 
 	private static final String INTERNAL_ROLES = "ROLE_MANAGER|ROLE_EMPLOYEE|ROLE_ADMIN";
 	private static final String EXTERNAL_ROLES = "ROLE_INDIVIDUAL|ROLE_MERCHANT";
+	
+	private static final String SSN_PATTERN = "(?!000|666)[0-8][0-9]{2}(?!00)[0-9]{2}(?!0000)[0-9]{4}";
 
 	
 	/**
@@ -162,6 +164,20 @@ public class ContraintUtils {
 	public static boolean validateExternalRole(String role) {
 		pattern = Pattern.compile(EXTERNAL_ROLES);
 		matcher = pattern.matcher(role);
+		
+		return matcher.matches();
+	}
+	
+	/**
+     * Validates ssn
+     * 
+     * @param ssn
+     *            The ssn to be validated
+     * @return boolean
+     */
+	public static boolean validateSSN(String ssn) {
+		pattern = Pattern.compile(SSN_PATTERN);
+		matcher = pattern.matcher(ssn);
 		
 		return matcher.matches();
 	}
