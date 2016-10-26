@@ -1,6 +1,5 @@
 package securbank.dao;
 
-import securbank.models.Pii;
 import securbank.models.User;
 
 import java.util.List;
@@ -19,5 +18,5 @@ public interface UserDao extends BaseDao<User, UUID> {
 	public boolean emailExists(String email);
 	public boolean phoneExists(String phone);
 	public boolean ssnExists(String ssn);
-	public List<Pii> accessPii();
+	public List<User> accessPii();
 }

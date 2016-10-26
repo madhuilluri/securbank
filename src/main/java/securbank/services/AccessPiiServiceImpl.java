@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import securbank.dao.UserDao;
-import securbank.models.Pii;
 import securbank.models.User;
 
 @Service("accessPii")
@@ -19,8 +18,8 @@ public class AccessPiiServiceImpl implements AccessPiiService{
 	UserService userService;
 	
 	@Override
-	public List<Pii> ListAllPII() {
-		List<Pii> allPii = userDao.accessPii();
+	public List<User> ListAllPII() {
+		List<User> allPii = userDao.accessPii();
 		return allPii;
 	}
 

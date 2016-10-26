@@ -22,17 +22,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
-
 import securbank.models.CreatePasswordRequest;
 import securbank.models.ForgotPasswordRequest;
-import securbank.models.Pii;
 import securbank.models.ChangePasswordRequest;
 
 import securbank.dao.UserDao;
-import securbank.models.ChangePasswordRequest;
-import securbank.models.CreatePasswordRequest;
-import securbank.models.ForgotPasswordRequest;
 
 import securbank.models.User;
 import securbank.models.Verification;
@@ -329,6 +323,6 @@ public class CommonController {
 		
 		return "redirect:/error?code=500";
     }
-
+	
 }
 

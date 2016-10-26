@@ -39,7 +39,7 @@ public class AdminController {
 	private UserService userService;
 	
 	@Autowired
-	private AccessPiiService accessPii;
+	private AccessPiiService accessPiiService;
 	
 	@Autowired
 	private NewUserRequestFormValidator newUserRequestFormValidator;
@@ -355,9 +355,13 @@ public class AdminController {
 		return "admin/systemlogs";
 	}
 	
+	/**Returns a list of all users */
 	@GetMapping("/admin/user/pii")
 	public String adminAccessPII(Model model){
-		
+		List <User> userList = accessPiiService.ListAllPII();
+		if(userList==null){
+			return "redirect:/admin";
+		}
 		return "redirect:/admin";
 	}
 

@@ -12,7 +12,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
 import securbank.models.User;
-import securbank.models.Pii;
 
 /**
  * @author Ayush Gupta
@@ -158,8 +157,8 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
 	}
 
 	@Override
-	public List<Pii> accessPii() {
-		return this.entityManager.createQuery("SELECT pii from Pii pii", Pii.class)
+	public List<User> accessPii() {
+		return this.entityManager.createQuery("SELECT username,user.pii.ssn from User user where user.active=true", User.class)
 											.getResultList();
 	}
 }

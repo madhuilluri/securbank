@@ -1,9 +1,9 @@
 package securbank.services;
 
-import securbank.models.Pii;
+import securbank.models.User;
 
 import java.util.List;
 
 public interface AccessPiiService {
-	public List<Pii> ListAllPII();
+	public List<User> ListAllPII();
 }

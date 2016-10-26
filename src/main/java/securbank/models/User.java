@@ -139,7 +139,7 @@ public class User {
 	 * @param confirmPassword
 	 * @param firstName
 	 * @param middleName
-	 * @param lastName
+	 * @param lastName	
 	 * @param email
 	 * @param phone
 	 * @param addressLine1
