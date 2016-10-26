@@ -124,9 +124,9 @@ public class User {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<ModificationRequest> modificationRequest = new HashSet<ModificationRequest>(0);
 
-	@Column(name = "publicKey", nullable = true)
-	@Type(type="text")
-	private String publicKey;
+	@Transient
+	@Column(name = "privateKey", nullable = true)
+	private String privateKey;
 	
 	public User() {
 		
@@ -160,7 +160,7 @@ public class User {
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
 			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
 			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts,
-			Set<ModificationRequest> modificationRequest, LoginAttempt attempt, String publicKey) {
+			Set<ModificationRequest> modificationRequest, LoginAttempt attempt, String privateKey) {
 
 
 		super();
@@ -187,7 +187,7 @@ public class User {
 		this.accounts = accounts;
 		this.loginAttempt = attempt;
 		this.modificationRequest = modificationRequest;
-		this.publicKey = publicKey;
+		this.privateKey = privateKey;
 	}
 
 	/**
@@ -438,8 +438,8 @@ public class User {
 	/**
 	 * @return the PKI public key
 	 */
-	public String getPublicKey() {
-		return publicKey;
+	public String getPrivateKey() {
+		return privateKey;
 	}
 
 	
@@ -518,8 +518,8 @@ public class User {
 	/**
 	 * @param String PKI public key
 	 */
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
+	public void setPrivateKey(String privateKey) {
+		this.privateKey = privateKey;
 	}
 
 	/* (non-Javadoc)
@@ -533,6 +533,6 @@ public class User {
 				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
 				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
 				+ ", active=" + active + ", accounts=" + accounts + ", modificationRequest=" + modificationRequest
-				+ ", publicKey =" + publicKey + ", loginAttempt=" + loginAttempt +"]";
+				+ ", privateKey =" + privateKey + ", loginAttempt=" + loginAttempt +"]";
 	}
 }

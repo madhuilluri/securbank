@@ -21,6 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import securbank.dao.UserDao;
 
+/**
+ * @author Amit Kumar
+ *
+ */
 @SuppressWarnings("restriction")
 @Service
 public class PkiService {
@@ -81,7 +85,7 @@ public class PkiService {
 	}
 
 	@Transactional
-	public String paymentinfoencryption(String id, String oprivatekey) {
+	public String paymentinfodecryption(String id, String oprivatekey) {
 
 		// get corresponding userName of userID
 		String userName = userDAO.findByUsernameOrEmail(id).getFirstName();
@@ -117,15 +121,16 @@ public class PkiService {
 	
 	}
 	
+	
 	@Transactional
-	public boolean paymentinfodecryption(String user, String payment) {
+	public boolean paymentinfoencryption(String user, String payment) {
 
 	//	System.out.println(payment);
 	//	System.out.println(" 1 ");
 		if(payment==null){
 			return false;
 		}
-		String user_publicKey = userDAO.findByUsernameOrEmail(user).getPublicKey();
+		String user_publicKey = userDAO.findByUsername(user).getPrivateKey();
 		System.out.println(user_publicKey);
 
 		byte[] decryption = null;

@@ -86,6 +86,10 @@ public class Transaction {
 	@Column(name = "otp")
 	private String otp;
 	
+	@Transient
+	@Column(name = "pki")
+	private String key;
+	
 	public Transaction(){
 		
 	}

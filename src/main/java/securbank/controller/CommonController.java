@@ -1,7 +1,15 @@
 package securbank.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -39,6 +47,8 @@ import securbank.services.VerificationService;
 import securbank.validators.ChangePasswordFormValidator;
 import securbank.validators.CreatePasswordFormValidator;
 import securbank.validators.NewUserFormValidator;
+import securbank.view.CreatePDF;
+
 
 /**
  * @author Ayush Gupta
@@ -46,6 +56,7 @@ import securbank.validators.NewUserFormValidator;
  */
 @Controller
 public class CommonController {
+	String TAG = getClass().toString() + " ";
 
 	@Autowired
 	AuthenticationService authSevice;
@@ -74,8 +85,8 @@ public class CommonController {
 	@Autowired
 	private ForgotPasswordService forgotPasswordService;
 	
+	@Autowired
 	ChangePasswordFormValidator changePasswordFormValidator;
-	
 
 	final static Logger logger = LoggerFactory.getLogger(CommonController.class);
 
@@ -105,6 +116,7 @@ public class CommonController {
 									// login screen again.
 	}
 
+	
 	@GetMapping("/signup")
 	public String signupForm(Model model) {
 		model.addAttribute("user", new User());
@@ -313,9 +325,8 @@ public class CommonController {
 		if(forgotPasswordService.createUserPassword(user, request) != null){
 			return "redirect:/login";
 		}
-		
+
 		return "redirect:/error?code=500";
     }
-
 }
 
