@@ -36,7 +36,7 @@ public class Transaction {
 	private UUID transactionId;
 	
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "accountId", nullable = false, updatable = false)
+	@JoinColumn(name = "accountNumber", nullable = false, updatable = false)
 	private Account account;
 	
 	@NotNull

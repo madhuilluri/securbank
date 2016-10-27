@@ -1,5 +1,7 @@
 package securbank.services;
 
+import javax.servlet.http.Cookie;
+
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Autowired
 	private ForgotPasswordService forgotPasswordService;
 
+	@Autowired
+	private UserService userService;
+	
 	private Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 	
 	/**
@@ -141,5 +146,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return targetUrl;
 	}
 
-	
+	public Cookie validateCookie(Cookie[] cookies, String username) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return null;
+		}
+		Cookie active = null;
+        if (cookies != null) {
+        	for (Cookie cookie : cookies) {
+        		if (cookie.getName().equals("flag")) {
+        			active = cookie;
+        			break;
+        		}
+        	}
+        }
+        if (active == null) {
+        	message = new SimpleMailMessage();
+        	message.setText(env.getProperty("suspicious.login.body"));
+			message.setSubject(env.getProperty("suspicious.login.subject"));
+			message.setTo(user.getEmail());
+			emailService.sendEmail(message);
+        }
+        
+        return active;
+	}
 }
