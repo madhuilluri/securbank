@@ -28,7 +28,7 @@ public class Pii {
 	
 	
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "userId", nullable = false)
+	@JoinColumn(name = "userId",referencedColumnName = "userId", nullable = false)
 	private User user;
 	
 	@NotNull

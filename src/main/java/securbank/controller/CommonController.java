@@ -77,6 +77,7 @@ public class CommonController {
 	@Autowired
 	private ForgotPasswordService forgotPasswordService;
 	
+	@Autowired
 	ChangePasswordFormValidator changePasswordFormValidator;
 
 	final static Logger logger = LoggerFactory.getLogger(CommonController.class);
@@ -124,11 +125,11 @@ public class CommonController {
 
 			return "signup";
 		}
-		Pii pii = new Pii();
+		//Pii pii = new Pii();
 		logger.info("POST request: signup");
 		logger.info("Username: " + user.getUsername());
 		logger.info("user_id " + user.getUserId());
-		logger.info("pii " + pii.getpId());
+		//logger.info("pii " + pii.getpId());
 		
 		userService.createExternalUser(user);
 
@@ -261,21 +262,27 @@ public class CommonController {
 	}
 
 	@PostMapping("/changepassword")
-	public String changeUserPassword(@ModelAttribute ChangePasswordRequest request, BindingResult binding) throws Exceptions {
-		changePasswordFormValidator.validate(request, binding);
+	public String changeUserPassword(@ModelAttribute ChangePasswordRequest changePasswordRequest, BindingResult binding) throws Exceptions {
+		logger.info("entered post request");
+		changePasswordFormValidator.validate(changePasswordRequest, binding);
+		if(binding.hasErrors()){
+			logger.info("POST request: changepassword form with validation errors");
+			return "changepassword";
+		}
 		User user = userService.getCurrentUser();
 		if (user == null) {
+			logger.info("user is null");
 			//return "redirect:/error?code=401";
 			throw new Exceptions("401"," ");
 		}
-		if (!userService.verifyCurrentPassword(user, request.getExistingPassword())) {
+		if (!userService.verifyCurrentPassword(user, changePasswordRequest.getExistingPassword())) {
 			binding.rejectValue("existingPassword", "invalid.password", "Password is not valid");
 		}
 		if (binding.hasErrors()) {
 			logger.info("POST request: changepassword form with validation errors");
 			return "changepassword";
 		}
-		if (userService.changeUserPassword(user, request) != null) {
+		if (userService.changeUserPassword(user, changePasswordRequest) != null) {
 			return "redirect:/login";
 		}
 

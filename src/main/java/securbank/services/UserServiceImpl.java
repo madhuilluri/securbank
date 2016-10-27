@@ -69,8 +69,8 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User createExternalUser(User user) {
-		Pii pii = user.getPii();
-		pii.setUser(user);
+		Pii pii = new Pii();
+		
 		logger.info("Creating new external user");
 		logger.info(user.toString());
 		user.setPassword(encoder.encode(user.getPassword()));
@@ -80,9 +80,13 @@ public class UserServiceImpl implements UserService {
 		
 		LoginAttempt attempt = new LoginAttempt(user, 0, LocalDateTime.now());		
 		user.setLoginAttempt(attempt);
-		user = userDao.save(user);
+		
 		pii.setUser(user);
 		pii.setSsn(user.getPii().getSsn());
+		user.setPii(pii);
+		user = userDao.save(user);
+		
+		
 		//setup up email message
 		message = new SimpleMailMessage();
 		message.setText(env.getProperty("external.user.verification.body").replace(":id:",user.getUserId().toString()));
