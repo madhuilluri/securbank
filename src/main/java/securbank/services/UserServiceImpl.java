@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User createInternalUser(User user) {
 		NewUserRequest newUserRequest = new NewUserRequest();
-		
+		Pii pii = new Pii();
 		// verify if request exists
 		newUserRequest = newUserRequestDao.findByEmailAndRole(user.getEmail(), user.getRole()); 
 		if (newUserRequest == null) {
@@ -133,6 +133,9 @@ public class UserServiceImpl implements UserService {
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(true);
 		
+		pii.setUser(user);
+		pii.setSsn(user.getPii().getSsn());
+		user.setPii(pii);
 		return userDao.save(user);
 	}
 	
