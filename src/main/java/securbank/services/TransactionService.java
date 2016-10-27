@@ -25,4 +25,6 @@ public interface TransactionService {
 	public Transaction getPendingTransactionByAccountNumber(Long accountNumber);
 	public Transaction approveTransactionFromTransfer(Transaction transaction);
 	public boolean isTransactionValid(Transaction transaction);
+	public List<Transaction> getNonCriticalTransactionsByStatus(String approvalStatus);
+	
 }

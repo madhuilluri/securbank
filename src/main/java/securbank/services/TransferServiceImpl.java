@@ -131,7 +131,9 @@ public class TransferServiceImpl implements TransferService{
 		transfer.setStatus("Pending");
 		transfer.setActive(true);
 		transfer.setCreatedOn(LocalDateTime.now());
-		
+		if (transfer.getAmount() > Double.parseDouble(env.getProperty("critical.amount"))) {
+			transfer.setCriticalStatus(true);
+		}
 		transferDao.save(transfer);
 		logger.info("After transferDao save");
 		
@@ -177,6 +179,9 @@ public class TransferServiceImpl implements TransferService{
 			return null;
 		}
 		
+		if (transfer.getAmount() > Double.parseDouble(env.getProperty("critical.amount"))) {
+			transfer.setCriticalStatus(true);
+		}
 		transfer.setStatus("Approved");
 		transfer.setModifiedBy(currentUser);
 		
@@ -429,6 +434,15 @@ public class TransferServiceImpl implements TransferService{
 		transferDao.update(transfer);
 		
 		return transfer;
+	}
+
+	@Override
+	public List<Transfer> getNonCriticalTransfersByStatus(String approvalStatus) {
+		logger.info("Getting pending transfers by approval status");
+		if(approvalStatus==null){
+			return null;
+		}
+		return transferDao.findNonCriticalByApprovalStatus(approvalStatus);
 	}
 
 }

@@ -19,4 +19,5 @@ public interface TransferDao extends BaseDao<Transfer, UUID>{
 	public List<Transfer> findByApprovalStatus(String approvalStatus);
 	public List<Transfer> findPendingTransferByFromAccount(Account fromAccount);
 	public List<Transfer> findByUserAndApprovalStatus(User user, String status);
+	public List<Transfer> findNonCriticalByApprovalStatus(String approvalStatus);
 }

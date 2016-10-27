@@ -44,7 +44,8 @@ class=form-horizontal <!DOCTYPE html>
 				</tr>
 				<tr>
 					<td>Amount</td>
-					<td th:text="${transaction.amount}"></td>
+					<td> <input type="text" name="amount" th:field="*{amount}" th:text="${transaction.amount}"/> </td>
+					<!-- <td th:text="${transaction.amount}"></td>  -->
 				</tr>
 				<tr>
 					<td>Type</td>
