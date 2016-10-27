@@ -3,13 +3,23 @@
  */
 package securbank.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +28,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import securbank.exceptions.Exceptions;
@@ -378,5 +389,63 @@ public class AdminController {
 	public String adminControllerSystemLogs(Model model) {
 		return "admin/systemlogs";
 	}
+	
+	@GetMapping("/admin/logDownload")
+    public void doDownload(HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+		
+		/**
+	     * Size of a byte buffer to read/write file
+	     */
+	    final int BUFFER_SIZE = 4096;
+	             
+	    /**
+	     * Path of the file to be downloaded, relative to application's directory
+	     */
+	    String filePath = "logs/application.log";
+	     
+ 
+        // get absolute path of the application
+        ServletContext context = request.getServletContext();
+        
+        ClassLoader classLoader = getClass().getClassLoader();
+ 
+        // construct the complete absolute path of the file
+        File downloadFile = new File(classLoader.getResource(filePath).getFile());
+        FileInputStream inputStream = new FileInputStream(downloadFile);
+         
+        // get MIME type of the file
+        String mimeType = context.getMimeType("text/plain");
+        if (mimeType == null) {
+            // set to binary type if MIME mapping not found
+            mimeType = "application/octet-stream";
+        }
+        System.out.println("MIME type: " + mimeType);
+ 
+        // set content attributes for the response
+        response.setContentType(mimeType);
+        response.setContentLength((int) downloadFile.length());
+ 
+        // set headers for the response
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"",
+                downloadFile.getName());
+        response.setHeader(headerKey, headerValue);
+ 
+        // get output stream of the response
+        OutputStream outStream = response.getOutputStream();
+ 
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int bytesRead = -1;
+ 
+        // write bytes read from the input stream into the output stream
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outStream.write(buffer, 0, bytesRead);
+        }
+ 
+        inputStream.close();
+        outStream.close();
+ 
+    }
 
 }

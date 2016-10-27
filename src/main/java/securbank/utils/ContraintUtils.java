@@ -28,7 +28,6 @@ public class ContraintUtils {
 	private static final String INTERNAL_ROLES = "ROLE_MANAGER|ROLE_EMPLOYEE|ROLE_ADMIN";
 	private static final String EXTERNAL_ROLES = "ROLE_INDIVIDUAL|ROLE_MERCHANT";
 
-	
 	/**
      * Validates username
      * 
