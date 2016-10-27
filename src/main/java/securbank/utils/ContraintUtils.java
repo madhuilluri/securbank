@@ -30,7 +30,6 @@ public class ContraintUtils {
 	
 	private static final String SSN_PATTERN = "(?!000|666)[0-8][0-9]{2}(?!00)[0-9]{2}(?!0000)[0-9]{4}";
 
-	
 	/**
      * Validates username
      * 

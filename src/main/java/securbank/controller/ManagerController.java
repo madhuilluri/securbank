@@ -279,6 +279,7 @@ public class ManagerController {
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getApprovalStatus())){
+			transaction.setAmount(trans.getAmount());
 			if(transactionService.isTransactionValid(transaction)==false && transaction.getType().equals("DEBIT")){
 				//return "redirect:/error?code=404&path=amount-invalid";
 				throw new Exceptions("404","Invalid Amount !");
@@ -409,6 +410,7 @@ public class ManagerController {
 
 		if("approved".equalsIgnoreCase(trans.getStatus())){
 			//check if transfer is valid in case modified
+			transfer.setAmount(trans.getAmount());
 			if(transferService.isTransferValid(transfer)==false){
 				//return "redirect:/error?code=401&path=amount-invalid";
 				throw new Exceptions("401","Invalid Amount !");

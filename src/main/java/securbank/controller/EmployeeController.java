@@ -448,7 +448,7 @@ public class EmployeeController {
 	@GetMapping("/employee/transactions")
     public String getTransactions(Model model) throws Exceptions {
 
-		List<Transaction> transactions = transactionService.getTransactionsByStatus("Pending");
+		List<Transaction> transactions = transactionService.getNonCriticalTransactionsByStatus("Pending");
 		if (transactions == null) {
 			//return "redirect:/error?code=500";
 			throw new Exceptions("500"," ");
@@ -500,6 +500,7 @@ public class EmployeeController {
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getApprovalStatus())){
+			transaction.setAmount(trans.getAmount());
 			if(transactionService.isTransactionValid(transaction)==false && transaction.getType().equals("DEBIT")){
 				//return "redirect:/error?code=404&path=amount-invalid";
 				throw new Exceptions("404","Invalid Amount !");
@@ -519,7 +520,7 @@ public class EmployeeController {
     public String getTransfers(Model model) throws Exceptions {
 		logger.info("GET request:  All pending transfers");
 		
-		List<Transfer> transfers = transferService.getTransfersByStatus("Pending");
+		List<Transfer> transfers = transferService.getNonCriticalTransfersByStatus("Pending");
 		if (transfers == null) {
 			//return "redirect:/error?code=500";
 			throw new Exceptions("500"," ");
@@ -588,6 +589,7 @@ public class EmployeeController {
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getStatus())){
+			transfer.setAmount(trans.getAmount());
 			if(transferService.isTransferValid(transfer)==false){
 				//return "redirect:/error?code=404&path=amount-invalid";
 				throw new Exceptions("404","Invalid Amount !");

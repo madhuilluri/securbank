@@ -21,4 +21,5 @@ public interface TransactionDao extends BaseDao<Transaction, UUID>{
 	public List<Transaction> findPendingByCriticalStatus(Boolean criticalStatus);
 	public List<Transaction> findPendingByAccount(Long accountNumber);
 	public Transaction findPendingTransactionByAccount(Long accountNumber);
+	public List<Transaction> findNonCriticalByApprovalStatus(String status);
 }

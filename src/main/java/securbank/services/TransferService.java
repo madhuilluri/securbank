@@ -24,4 +24,5 @@ public interface TransferService {
 	public boolean isToAccountValid(Transfer transfer);
 	public Transfer initiateMerchantPaymentRequest(Transfer transfer);
 	public Transfer approveTransferToPending(Transfer transfer);
+	public List<Transfer> getNonCriticalTransfersByStatus(String approvalStatus);
 }

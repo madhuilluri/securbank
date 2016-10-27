@@ -4,10 +4,16 @@
 package securbank.controller;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
-import java.util.UUID;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -20,23 +26,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import securbank.exceptions.Exceptions;
 import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
-
+import securbank.models.ViewAuthorization;
 import securbank.services.AccountService;
 import securbank.services.OtpService;
-import securbank.models.ViewAuthorization;
-import securbank.services.UserService;
-import securbank.services.ViewAuthorizationService;
+import securbank.services.PDFService;
 import securbank.services.TransactionService;
 import securbank.services.TransferService;
-import securbank.validators.NewTransactionFormValidator;
-import securbank.validators.NewTransferFormValidator;
+import securbank.services.UserService;
+import securbank.services.ViewAuthorizationService;
 import securbank.validators.EditUserFormValidator;
 import securbank.validators.NewMerchantPaymentFormValidator;
+import securbank.validators.NewTransactionFormValidator;
+import securbank.validators.NewTransferFormValidator;
 import securbank.validators.NewUserFormValidator;
 
 
@@ -48,6 +55,9 @@ import securbank.validators.NewUserFormValidator;
 public class ExternalUserController {
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	PDFService pdfService;
 	
 	@Autowired
 	private TransactionService transactionService;
@@ -358,5 +368,35 @@ public class ExternalUserController {
 		
         return "redirect:/user/request?successAction=true";
     }
+	
+	@RequestMapping("/user/downloadPDF")
+	public void downloadPDF(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		final ServletContext servletContext = request.getSession().getServletContext();
+		final File tempDirectory = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+		final String temperotyFilePath = tempDirectory.getAbsolutePath();
+		
+		User user = userService.getCurrentUser();
+
+		String fileName = "account_statement.pdf";
+		response.setContentType("application/pdf");
+		response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+
+		
+		try {
+
+			pdfService.createStatementPDF(temperotyFilePath + "\\" + fileName, user);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			baos = pdfService.convertPDFToByteArrayOutputStream(temperotyFilePath + "\\" + fileName);
+			OutputStream os = response.getOutputStream();
+			baos.writeTo(os);
+			os.flush();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
+	}
+
+	
 
 }
